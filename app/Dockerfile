@@ -4,7 +4,7 @@
 # ==============================================================================
 
 # Stage 1: Build & Dependency Resolution Stage
-FROM python:3.11-slim-bookworm AS builder
+FROM python:3.14-slim-bookworm AS builder
 
 # Prevent python from writing pyc files to disk and buffering stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1 \
