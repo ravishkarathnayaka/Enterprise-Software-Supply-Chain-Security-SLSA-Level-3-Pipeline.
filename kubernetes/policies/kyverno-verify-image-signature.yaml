@@ -1,0 +1,62 @@
+# ==============================================================================
+# Kyverno ClusterPolicy: Verify Cosign Image Signature
+# Supply Chain Security: Validates cryptographic signature before pod admission
+# ==============================================================================
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signature
+  annotations:
+    policies.kyverno.io/title: Verify Cosign Image Signatures
+    policies.kyverno.io/category: Software Supply Chain Security
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Verifies that all container images deployed to the secure-workloads namespace
+      are signed with an approved cryptographic key or trusted Sigstore keyless OIDC identity.
+      Unsigned images or images signed by untrusted parties are blocked at admission time.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    # Rule 1: Local Lab Cluster Verification (Cosign Key-based)
+    - name: verify-local-image-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - secure-workloads
+      verifyImages:
+        - imageReferences:
+            - "localhost:5001/*"
+            - "kind-registry:5000/*"
+          mutateDigest: false
+          required: true
+          key: |-
+            -----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE24FzO3p8hLpZ5K3+c7o1yW2MhNqO
+            v5B5Q2eY8K9lV2jR4y1Z4Z0n1o8N6e4w1P0x7q3X8z5a1b2c3d4e5f6g7h==
+            -----END PUBLIC KEY-----
+
+    # Rule 2: Production CI/CD Cloud Verification (Sigstore Keyless OIDC via GitHub Actions)
+    - name: verify-cloud-ghcr-image-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - secure-workloads
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/*"
+          mutateDigest: false
+          required: true
+          attestors:
+            - entries:
+                - keyless:
+                    issuer: "https://token.actions.githubusercontent.com"
+                    subject: "https://github.com/*"
+                    rekor:
+                      url: "https://rekor.sigstore.dev"

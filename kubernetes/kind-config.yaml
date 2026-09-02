@@ -1,0 +1,21 @@
+# ==============================================================================
+# Local Kubernetes (Kind) Multi-Node Cluster Configuration
+# Configured for Local Container Registry integration and Kyverno Admission Control
+# ==============================================================================
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8080
+        listenAddress: "127.0.0.1"
+        protocol: TCP
+  - role: worker
+  - role: worker
+
+# Containerd config patch to connect with local unauthenticated registry
+containerdConfigPatches:
+  - |-
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      config_path = "/etc/containerd/certs.d"

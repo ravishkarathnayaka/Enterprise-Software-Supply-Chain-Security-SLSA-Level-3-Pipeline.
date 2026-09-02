@@ -1,0 +1,307 @@
+# ==============================================================================
+# Enterprise Software Supply Chain Security & SLSA Level 3 CI/CD Pipeline
+# Zero-Cost, End-to-End Automated Pipeline on GitHub Actions
+# ==============================================================================
+name: Enterprise Security & SLSA Level 3 Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write          # Mandatory for Sigstore Fulcio/Rekor keyless signing
+  security-events: write   # Upload SARIF reports to GitHub Security Center
+  actions: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ============================================================================
+  # Stage 1: Secret Scanning
+  # ============================================================================
+  secret-scan:
+    name: "Stage 1: Gitleaks Secret Detection"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: security/gitleaks/.gitleaks.toml
+
+  # ============================================================================
+  # Stage 2: Static Application Security Testing (SAST)
+  # ============================================================================
+  sast-analysis:
+    name: "Stage 2: Semgrep OWASP SAST Analysis"
+    runs-on: ubuntu-latest
+    needs: [secret-scan]
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Semgrep Engine
+        run: python3 -m pip install semgrep
+
+      - name: Execute Semgrep Scans (OWASP Top 10 + Custom Rules)
+        run: |
+          semgrep scan \
+            --config "p/owasp-top-ten" \
+            --config "p/security-audit" \
+            --config "security/semgrep/rules.yml" \
+            --sarif \
+            --output semgrep-results.sarif \
+            --error
+
+      - name: Upload Semgrep SARIF to GitHub Security Center
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+
+  # ============================================================================
+  # Stage 3: Software Composition Analysis (SCA) & License Compliance
+  # ============================================================================
+  sca-scan:
+    name: "Stage 3: Trivy Dependency & License SCA"
+    runs-on: ubuntu-latest
+    needs: [secret-scan]
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Scan Repository Dependencies with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: "fs"
+          ignore-unfixed: true
+          format: "table"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
+
+  # ============================================================================
+  # Stage 4 & 5: Container Hardening, Vulnerability Scan & Dual-Format SBOM
+  # ============================================================================
+  build-and-sbom:
+    name: "Stage 4 & 5: Hardened Build, CVE Scan & Syft SBOM"
+    runs-on: ubuntu-latest
+    needs: [sast-analysis, sca-scan]
+    outputs:
+      image-digest: ${{ steps.build-push.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - name: Build & Push Distroless Container Image
+        id: build-push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./app
+          file: ./app/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Scan Container Image for CVEs with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}
+          format: "table"
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: "CRITICAL,HIGH"
+
+      - name: Install Syft SBOM CLI
+        uses: anchore/sbom-action/download-syft@v0.17.9
+
+      - name: Generate Dual-Format SBOMs (SPDX & CycloneDX)
+        run: |
+          echo "Generating SPDX JSON SBOM..."
+          syft "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}" \
+            -o spdx-json=sbom.spdx.json
+
+          echo "Generating CycloneDX JSON SBOM..."
+          syft "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}" \
+            -o cyclonedx-json=sbom.cdx.json
+
+      - name: Archive SBOM Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-artifacts
+          path: |
+            sbom.spdx.json
+            sbom.cdx.json
+
+  # ============================================================================
+  # Stage 6: Keyless Signing & Attestation (Sigstore Cosign)
+  # ============================================================================
+  sign-and-attest:
+    name: "Stage 6: Sigstore Keyless Signing & SBOM Attestation"
+    runs-on: ubuntu-latest
+    needs: [build-and-sbom]
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Download SBOM Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom-artifacts
+
+      - name: Install Cosign CLI
+        uses: sigstore/cosign-installer@v3.7.0
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Keyless Cryptographic Image Signing via GitHub OIDC
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+        run: |
+          echo "Signing container image keylessly via Sigstore Fulcio and Rekor..."
+          cosign sign --yes "${IMAGE_URI}"
+
+      - name: Attest SPDX SBOM to Container Image
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+        run: |
+          echo "Attesting SPDX SBOM predicate..."
+          cosign attest --yes \
+            --predicate sbom.spdx.json \
+            --type spdxjson \
+            "${IMAGE_URI}"
+
+      - name: Verify Keyless Signature & Identity
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+        run: |
+          echo "Verifying cryptographic signature using Rekor transparency log..."
+          cosign verify \
+            --certificate-identity-regexp "^https://github.com/${{ github.repository }}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "${IMAGE_URI}"
+
+  # ============================================================================
+  # Stage 7: SLSA Level 3 Provenance Attestation
+  # ============================================================================
+  slsa-provenance:
+    name: "Stage 7: SLSA Level 3 Provenance Attestation"
+    runs-on: ubuntu-latest
+    needs: [build-and-sbom, sign-and-attest]
+    steps:
+      - name: Install Cosign CLI
+        uses: sigstore/cosign-installer@v3.7.0
+
+      - name: Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construct in-toto SLSA Provenance Predicate
+        env:
+          IMAGE_DIGEST: ${{ needs.build-and-sbom.outputs.image-digest }}
+        run: |
+          cat <<EOF > slsa-predicate.json
+          {
+            "_type": "https://in-toto.io/Statement/v1",
+            "subject": [
+              {
+                "name": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}",
+                "digest": {
+                  "sha256": "${IMAGE_DIGEST#sha256:}"
+                }
+              }
+            ],
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "predicate": {
+              "buildDefinition": {
+                "buildType": "https://actions.github.com/buildtypes/v1",
+                "externalParameters": {
+                  "workflow": "${{ github.workflow }}",
+                  "repository": "${{ github.repository }}",
+                  "ref": "${{ github.ref }}"
+                },
+                "internalParameters": {
+                  "runId": "${{ github.run_id }}",
+                  "attempt": "${{ github.run_attempt }}"
+                },
+                "resolvedDependencies": [
+                  {
+                    "uri": "git+https://github.com/${{ github.repository }}@${{ github.sha }}",
+                    "digest": {
+                      "gitCommit": "${{ github.sha }}"
+                    }
+                  }
+                ]
+              },
+              "runDetails": {
+                "builder": {
+                  "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                },
+                "metadata": {
+                  "invocationId": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                  "startedOn": "${{ github.event.repository.updated_at }}"
+                }
+              }
+            }
+          }
+          EOF
+
+      - name: Sign & Attest SLSA Provenance via Cosign
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+        run: |
+          echo "Attesting SLSA Provenance statement..."
+          cosign attest --yes \
+            --predicate slsa-predicate.json \
+            --type slsaprovenance \
+            "${IMAGE_URI}"

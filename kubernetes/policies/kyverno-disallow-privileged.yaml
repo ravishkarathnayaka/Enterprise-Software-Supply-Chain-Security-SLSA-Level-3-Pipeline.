@@ -1,0 +1,67 @@
+# ==============================================================================
+# Kyverno ClusterPolicy: Disallow Privileged Containers & Root Execution
+# Enforces Kubernetes Pod Security Standards (Restricted)
+# ==============================================================================
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-and-root-users
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers and Root Execution
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Privileged containers and root users can easily escalate privileges and break
+      out of container isolation to host kernel level. This policy enforces that all
+      containers in target namespaces run non-root, drop ALL capabilities, and prohibit
+      privilege escalation.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-privileged-and-escalation
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - secure-workloads
+      validate:
+        message: >-
+          Running privileged containers, allowing privilege escalation, or failing to
+          drop ALL capabilities is strictly forbidden under enterprise security policy.
+        pattern:
+          spec:
+            =(securityContext):
+              =(runAsNonRoot): true
+            containers:
+              - securityContext:
+                  allowPrivilegeEscalation: false
+                  =(privileged): false
+                  capabilities:
+                    drop:
+                      - ALL
+
+    - name: check-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - secure-workloads
+      validate:
+        message: "Running as root user (UID 0) is prohibited. Containers must explicitly set runAsNonRoot: true or a non-zero runAsUser."
+        anyPattern:
+          - spec:
+              securityContext:
+                runAsNonRoot: true
+          - spec:
+              containers:
+                - securityContext:
+                    runAsNonRoot: true
+          - spec:
+              containers:
+                - securityContext:
+                    runAsUser: ">0"

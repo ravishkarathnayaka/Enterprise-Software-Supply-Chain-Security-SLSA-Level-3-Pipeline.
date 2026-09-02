@@ -1,0 +1,18 @@
+# ==============================================================================
+# Kubernetes Pod Security Standards (PSS) Restricted Namespace
+# Enforces native admission controller baseline and Kyverno admission policies
+# ==============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: secure-workloads
+  labels:
+    name: secure-workloads
+    app.kubernetes.io/environment: production
+    # Native Kubernetes Pod Security Admission (Restricted Profile)
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/audit-version: latest
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/warn-version: latest

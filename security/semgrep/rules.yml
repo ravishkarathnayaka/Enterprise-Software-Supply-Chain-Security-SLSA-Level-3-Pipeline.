@@ -1,0 +1,159 @@
+rules:
+  # ----------------------------------------------------------------------------
+  # OWASP A03:2021 - Injection (Command Injection)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-command-injection-subprocess-shell
+    patterns:
+      - pattern-either:
+          - pattern: subprocess.$METHOD(..., shell=True, ...)
+          - pattern: os.system(...)
+          - pattern: os.popen(...)
+    message: >-
+      Detected direct shell command execution with shell=True or os.system/os.popen.
+      This allows arbitrary command injection if input contains untrusted data.
+      Use subprocess with arguments passed as an explicit list and shell=False.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp: "A03:2021 - Injection"
+      category: security
+      confidence: HIGH
+      references:
+        - https://owasp.org/Top10/A03_2021-Injection/
+
+  # ----------------------------------------------------------------------------
+  # OWASP A03:2021 - Injection (Dynamic Code Execution)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-code-injection-eval-exec
+    patterns:
+      - pattern-either:
+          - pattern: eval(...)
+          - pattern: exec(...)
+    message: >-
+      Detected use of 'eval()' or 'exec()'. Dynamically evaluating code is inherently
+      unsafe and can lead to remote code execution (RCE). Use safe parsing alternatives
+      such as ast.literal_eval() or structured schemas.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')"
+      owasp: "A03:2021 - Injection"
+      category: security
+      confidence: HIGH
+
+  # ----------------------------------------------------------------------------
+  # OWASP A10:2021 - Server-Side Request Forgery (SSRF)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-ssrf-unvalidated-http-client
+    patterns:
+      - pattern-either:
+          - pattern: requests.$METHOD($URL, ...)
+          - pattern: httpx.$METHOD($URL, ...)
+      - pattern-not: requests.$METHOD("...", ...)
+      - pattern-not: httpx.$METHOD("...", ...)
+    message: >-
+      Detected HTTP client request using a variable URL '$URL'. If this parameter is
+      user-controlled, it introduces Server-Side Request Forgery (SSRF). Ensure the
+      target URL is validated against a strict internal domain allowlist.
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-918: Server-Side Request Forgery (SSRF)"
+      owasp: "A10:2021 - Server-Side Request Forgery (SSRF)"
+      category: security
+      confidence: MEDIUM
+
+  # ----------------------------------------------------------------------------
+  # OWASP A01:2021 - Broken Access Control (Path Traversal)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-path-traversal-open
+    patterns:
+      - pattern: open($PATH, ...)
+      - pattern-not: open("...", ...)
+      - pattern-not-inside: |
+          $SAFE_PATH = os.path.abspath(...)
+          ...
+          open($SAFE_PATH, ...)
+      - pattern-not-inside: |
+          $SAFE_PATH = pathlib.Path(...).resolve()
+          ...
+          open($SAFE_PATH, ...)
+    message: >-
+      Detected file access via 'open()' using a variable path without apparent
+      canonicalization or containment validation. Ensure paths are resolved and
+      constrained to an authorized directory to prevent arbitrary file read/write.
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+      owasp: "A01:2021 - Broken Access Control"
+      category: security
+      confidence: MEDIUM
+
+  # ----------------------------------------------------------------------------
+  # OWASP A08:2021 - Software and Data Integrity Failures (Insecure Deserialization)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-insecure-deserialization-pickle
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: pickle.load(...)
+          - pattern: _pickle.loads(...)
+    message: >-
+      Detected deserialization with 'pickle'. The pickle module is not secure against
+      erroneous or maliciously constructed data. Never unpickle untrusted data.
+      Use safer serialization formats such as JSON or Protocol Buffers.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      owasp: "A08:2021 - Software and Data Integrity Failures"
+      category: security
+      confidence: HIGH
+
+  # ----------------------------------------------------------------------------
+  # OWASP A02:2021 - Cryptographic Failures (Weak Hash Functions)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-weak-cryptography-hash
+    patterns:
+      - pattern-either:
+          - pattern: hashlib.md5(...)
+          - pattern: hashlib.sha1(...)
+    message: >-
+      Detected use of weak hash algorithms (MD5 or SHA1). These algorithms have proven
+      collision vulnerabilities and must not be used for cryptographic security or
+      integrity validation. Use SHA-256 or SHA-3 instead.
+    severity: WARNING
+    languages: [python]
+    metadata:
+      cwe: "CWE-328: Use of Weak Hash"
+      owasp: "A02:2021 - Cryptographic Failures"
+      category: security
+      confidence: HIGH
+
+  # ----------------------------------------------------------------------------
+  # OWASP A07:2021 - Identification and Authentication Failures (Hardcoded Secret)
+  # ----------------------------------------------------------------------------
+  - id: custom-owasp-hardcoded-secret-assignment
+    patterns:
+      - pattern-either:
+          - pattern: $SECRET = "..."
+      - metavariable-regex:
+          metavariable: $SECRET
+          regex: (?i)(api_key|secret_key|private_key|auth_token|jwt_secret|password)
+      - pattern-not: $SECRET = ""
+      - pattern-not: $SECRET = "test"
+      - pattern-not: $SECRET = os.getenv(...)
+      - pattern-not: $SECRET = os.environ.get(...)
+    message: >-
+      Potential hardcoded secret or token detected in variable assignment '$SECRET'.
+      Secrets must be retrieved from environment variables, secret managers, or
+      Kubernetes Secrets, never committed to version control.
+    severity: ERROR
+    languages: [python]
+    metadata:
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      owasp: "A07:2021 - Identification and Authentication Failures"
+      category: security
+      confidence: MEDIUM

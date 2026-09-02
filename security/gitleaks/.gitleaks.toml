@@ -1,0 +1,49 @@
+# ==============================================================================
+# Gitleaks Configuration: Enterprise DevSecOps Secret Scanning Policy
+# Target: High-confidence detection with explicit allowlists
+# ==============================================================================
+
+title = "Enterprise Supply Chain Security Gitleaks Profile"
+
+[extend]
+# Inherit official Gitleaks default ruleset
+useDefault = true
+
+[allowlist]
+description = "Global allowlist for testing, documentation, and mock values"
+paths = [
+  '''^\.git/''',
+  '''^app/tests/''',
+  '''^README\.md$''',
+  '''^security/gitleaks/\.gitleaks\.toml$'''
+]
+regexes = [
+  '''(?i)example[_-]?key''',
+  '''(?i)dummy[_-]?token''',
+  '''(?i)test[_-]?secret''',
+  '''e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855''', # Empty SHA256 test digest
+  '''test-audit-corr-9988-aabb'''
+]
+
+# Custom Enterprise Rule: Hardcoded Internal API Tokens
+[[rules]]
+id = "enterprise-internal-api-token"
+description = "Enterprise Internal Microservice Authentication Token"
+regex = '''(?i)(api[_-]?token|auth[_-]?token|service[_-]?key)\s*[:=]\s*["'][A-Za-z0-9_-]{32,64}["']'''
+secretGroup = 0
+keywords = [
+  "api_token",
+  "auth_token",
+  "service_key"
+]
+entropy = 3.5
+
+# Custom Enterprise Rule: Cosign Private Key File
+[[rules]]
+id = "sigstore-cosign-private-key"
+description = "Sigstore/Cosign Encrypted or Unencrypted Private Key Payload"
+regex = '''-----BEGIN (?:ENCRYPTED )?SIGSTORE PRIVATE KEY-----'''
+keywords = [
+  "BEGIN SIGSTORE PRIVATE KEY",
+  "BEGIN ENCRYPTED SIGSTORE PRIVATE KEY"
+]

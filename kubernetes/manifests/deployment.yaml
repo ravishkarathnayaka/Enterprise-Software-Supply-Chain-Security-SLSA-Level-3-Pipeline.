@@ -1,0 +1,116 @@
+# ==============================================================================
+# Hardened Workload Specification: PSS Restricted Compliant Deployment
+# Complies with Kyverno security policies and zero-trust supply chain requirements
+# ==============================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secure-app-sa
+  namespace: secure-workloads
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secure-app
+  namespace: secure-workloads
+  labels:
+    app.kubernetes.io/name: secure-app
+    app.kubernetes.io/part-of: supply-chain-demo
+    app.kubernetes.io/managed-by: gitops
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: secure-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: secure-app
+    spec:
+      serviceAccountName: secure-app-sa
+      automountServiceAccountToken: false
+      
+      # Pod-level security context enforcing non-root execution and default seccomp profile
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: secure-microservice
+          image: localhost:5001/secure-app:v1.0.0
+          imagePullPolicy: IfNotPresent
+          
+          # Container-level hardening: Read-only rootfs, drop all kernel capabilities
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            capabilities:
+              drop:
+                - ALL
+
+          ports:
+            - containerPort: 8000
+              name: http-api
+              protocol: TCP
+
+          # Health checks
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http-api
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http-api
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+
+          # Bounded resource allocation preventing starvation
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          # Writable ephemeral volume for scratch/tmp space
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: secure-app-service
+  namespace: secure-workloads
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: secure-app
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080

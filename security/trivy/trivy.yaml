@@ -1,0 +1,46 @@
+# ==============================================================================
+# Trivy Scanner Configuration: Vulnerability, Secret & Misconfiguration Policy
+# ==============================================================================
+
+# General scanning options
+exit-code: 1
+severity:
+  - HIGH
+  - CRITICAL
+
+# Focus on actionable, remediable vulnerabilities
+ignore-unfixed: true
+
+# Active security scanners
+scan:
+  scanners:
+    - vuln
+    - misconfig
+    - secret
+
+# Output formatting
+format: table
+
+# Vulnerability source types
+vulnerability:
+  type:
+    - os
+    - library
+
+# Secret scanning integration
+secret:
+  config: "security/gitleaks/.gitleaks.toml"
+
+# Misconfiguration scanning checks
+misconfiguration:
+  scanners:
+    - dockerfile
+    - kubernetes
+
+# Documented exceptions / triage policy (.trivyignore equivalent)
+# In enterprise settings, every suppressed CVE must have a designated ticket, rationale, and review date.
+# Example format:
+# ignored-cves:
+#   - id: CVE-2023-XXXXX
+#     statement: "Evaluated by AppSec: vulnerable code path not reachable in Distroless runtime"
+#     expires: "2026-12-31"
