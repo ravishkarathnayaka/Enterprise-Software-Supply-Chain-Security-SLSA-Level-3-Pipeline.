@@ -1,6 +1,6 @@
 # Pinned Python dependencies for Enterprise Supply Chain Security (SLSA Level 3)
 # Exact version pinning for deterministic, reproducible builds
-annotated-types==0.7.0
+annotated-types==0.8.0
 anyio==4.6.0
 click==8.1.7
 fastapi==0.115.0
