@@ -85,14 +85,13 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
+      - name: Install Trivy Security Scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Scan Repository Dependencies with Trivy
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          scan-type: "fs"
-          ignore-unfixed: true
-          format: "table"
-          exit-code: "0"
-          severity: "CRITICAL,HIGH"
+        run: |
+          trivy fs --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 .
 
   # ============================================================================
   # Stage 4 & 5: Container Hardening, Vulnerability Scan & Dual-Format SBOM
@@ -109,15 +108,14 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
-      - name: Sanitize OCI Image Name (lowercase, no trailing punctuation)
+      - name: Sanitize OCI Image Name (lowercase, alphanumeric/hyphen only)
         id: naming
         run: |
           RAW_NAME="${{ github.repository }}"
-          # OCI specifications require lowercase names and no trailing dots
           CLEAN_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_/-]//g')
           echo "clean_name=$CLEAN_NAME" >> $GITHUB_OUTPUT
           echo "IMAGE_NAME=$CLEAN_NAME" >> $GITHUB_ENV
-          echo "Sanitized OCI image target: ghcr.io/$CLEAN_NAME"
+          echo "Target OCI repository: ghcr.io/$CLEAN_NAME"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -149,14 +147,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Install Trivy Security Scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Scan Container Image for CVEs with Trivy
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}
-          format: "table"
-          exit-code: "0"
-          ignore-unfixed: true
-          severity: "CRITICAL,HIGH"
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}"
 
       - name: Install Syft SBOM CLI
         uses: anchore/sbom-action/download-syft@v0.17.9

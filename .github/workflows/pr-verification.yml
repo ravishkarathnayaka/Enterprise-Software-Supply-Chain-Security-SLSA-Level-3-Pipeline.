@@ -92,11 +92,10 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
+      - name: Install Trivy Security Scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Scan Filesystem for Vulnerable Dependencies
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          scan-type: "fs"
-          ignore-unfixed: true
-          format: "table"
-          exit-code: "0"
-          severity: "CRITICAL,HIGH"
+        run: |
+          trivy fs --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 .
