@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -50,7 +50,7 @@ jobs:
     needs: [secret-scan]
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Python Environment
         uses: actions/setup-python@v5
@@ -83,7 +83,7 @@ jobs:
     needs: [secret-scan]
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Trivy Security Scanner
         run: |
@@ -106,7 +106,7 @@ jobs:
       clean-image-name: ${{ steps.naming.outputs.clean_name }}
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Sanitize OCI Image Name (lowercase, alphanumeric/hyphen only)
         id: naming
@@ -185,7 +185,7 @@ jobs:
     needs: [build-and-sbom]
     steps:
       - name: Checkout Code Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download SBOM Artifacts
         uses: actions/download-artifact@v4
