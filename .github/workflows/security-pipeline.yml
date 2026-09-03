@@ -156,7 +156,7 @@ jobs:
           trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}"
 
       - name: Install Syft SBOM CLI
-        uses: anchore/sbom-action/download-syft@v0.17.9
+        uses: anchore/sbom-action/download-syft@v0.24.2
 
       - name: Generate Dual-Format SBOMs (SPDX & CycloneDX)
         run: |
