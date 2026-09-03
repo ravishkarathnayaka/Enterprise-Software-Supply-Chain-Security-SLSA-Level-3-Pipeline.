@@ -137,11 +137,10 @@ rules:
   # ----------------------------------------------------------------------------
   - id: custom-owasp-hardcoded-secret-assignment
     patterns:
-      - pattern-either:
-          - pattern: $SECRET = "..."
+      - pattern: $SECRET = "..."
       - metavariable-regex:
           metavariable: $SECRET
-          regex: (?i)(api_key|secret_key|private_key|auth_token|jwt_secret|password)
+          regex: ".*(?i)(api_key|secret_key|private_key|auth_token|jwt_secret|password).*"
       - pattern-not: $SECRET = ""
       - pattern-not: $SECRET = "test"
       - pattern-not: $SECRET = os.getenv(...)

@@ -1,0 +1,12 @@
+# Semgrep ignore file
+# Ignore test files that intentionally contain injection and attack strings for unit testing
+app/tests/
+tests/
+test/
+
+# Ignore virtual environments, git, and local scratch files
+.git/
+.venv/
+venv/
+node_modules/
+scripts/
