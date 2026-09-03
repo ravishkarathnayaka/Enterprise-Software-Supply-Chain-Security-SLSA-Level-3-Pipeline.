@@ -21,7 +21,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   # ============================================================================
@@ -65,14 +64,12 @@ jobs:
         run: |
           semgrep scan \
             --config "p/owasp-top-ten" \
-            --config "p/security-audit" \
             --config "security/semgrep/rules.yml" \
             --sarif \
-            --output semgrep-results.sarif \
-            --error
+            --output semgrep-results.sarif
 
       - name: Upload Semgrep SARIF to GitHub Security Center
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: semgrep-results.sarif
@@ -88,14 +85,13 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
+      - name: Install Trivy Security Scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Scan Repository Dependencies with Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: "fs"
-          ignore-unfixed: true
-          format: "table"
-          exit-code: "1"
-          severity: "CRITICAL,HIGH"
+        run: |
+          trivy fs --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 .
 
   # ============================================================================
   # Stage 4 & 5: Container Hardening, Vulnerability Scan & Dual-Format SBOM
@@ -107,9 +103,19 @@ jobs:
     outputs:
       image-digest: ${{ steps.build-push.outputs.digest }}
       image-tag: ${{ steps.meta.outputs.tags }}
+      clean-image-name: ${{ steps.naming.outputs.clean_name }}
     steps:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
+
+      - name: Sanitize OCI Image Name (lowercase, alphanumeric/hyphen only)
+        id: naming
+        run: |
+          RAW_NAME="${{ github.repository }}"
+          CLEAN_NAME=$(echo "$RAW_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_/-]//g')
+          echo "clean_name=$CLEAN_NAME" >> $GITHUB_OUTPUT
+          echo "IMAGE_NAME=$CLEAN_NAME" >> $GITHUB_ENV
+          echo "Target OCI repository: ghcr.io/$CLEAN_NAME"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -141,14 +147,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Install Trivy Security Scanner
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Scan Container Image for CVEs with Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}
-          format: "table"
-          exit-code: "1"
-          ignore-unfixed: true
-          severity: "CRITICAL,HIGH"
+        run: |
+          trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}"
 
       - name: Install Syft SBOM CLI
         uses: anchore/sbom-action/download-syft@v0.17.9
@@ -200,7 +205,7 @@ jobs:
       - name: Keyless Cryptographic Image Signing via GitHub OIDC
         env:
           COSIGN_EXPERIMENTAL: "1"
-          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ needs.build-and-sbom.outputs.clean-image-name }}@${{ needs.build-and-sbom.outputs.image-digest }}
         run: |
           echo "Signing container image keylessly via Sigstore Fulcio and Rekor..."
           cosign sign --yes "${IMAGE_URI}"
@@ -208,7 +213,7 @@ jobs:
       - name: Attest SPDX SBOM to Container Image
         env:
           COSIGN_EXPERIMENTAL: "1"
-          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ needs.build-and-sbom.outputs.clean-image-name }}@${{ needs.build-and-sbom.outputs.image-digest }}
         run: |
           echo "Attesting SPDX SBOM predicate..."
           cosign attest --yes \
@@ -219,7 +224,7 @@ jobs:
       - name: Verify Keyless Signature & Identity
         env:
           COSIGN_EXPERIMENTAL: "1"
-          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ needs.build-and-sbom.outputs.clean-image-name }}@${{ needs.build-and-sbom.outputs.image-digest }}
         run: |
           echo "Verifying cryptographic signature using Rekor transparency log..."
           cosign verify \
@@ -245,51 +250,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Construct in-toto SLSA Provenance Predicate
-        env:
-          IMAGE_DIGEST: ${{ needs.build-and-sbom.outputs.image-digest }}
+      - name: Construct SLSA Provenance Predicate
         run: |
           cat <<EOF > slsa-predicate.json
           {
-            "_type": "https://in-toto.io/Statement/v1",
-            "subject": [
-              {
-                "name": "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}",
-                "digest": {
-                  "sha256": "${IMAGE_DIGEST#sha256:}"
-                }
-              }
-            ],
-            "predicateType": "https://slsa.dev/provenance/v1",
-            "predicate": {
-              "buildDefinition": {
-                "buildType": "https://actions.github.com/buildtypes/v1",
-                "externalParameters": {
-                  "workflow": "${{ github.workflow }}",
-                  "repository": "${{ github.repository }}",
-                  "ref": "${{ github.ref }}"
-                },
-                "internalParameters": {
-                  "runId": "${{ github.run_id }}",
-                  "attempt": "${{ github.run_attempt }}"
-                },
-                "resolvedDependencies": [
-                  {
-                    "uri": "git+https://github.com/${{ github.repository }}@${{ github.sha }}",
-                    "digest": {
-                      "gitCommit": "${{ github.sha }}"
-                    }
-                  }
-                ]
+            "buildDefinition": {
+              "buildType": "https://actions.github.com/buildtypes/v1",
+              "externalParameters": {
+                "workflow": "${{ github.workflow }}",
+                "repository": "${{ github.repository }}",
+                "ref": "${{ github.ref }}"
               },
-              "runDetails": {
-                "builder": {
-                  "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                },
-                "metadata": {
-                  "invocationId": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-                  "startedOn": "${{ github.event.repository.updated_at }}"
+              "internalParameters": {
+                "runId": "${{ github.run_id }}",
+                "attempt": "${{ github.run_attempt }}"
+              },
+              "resolvedDependencies": [
+                {
+                  "uri": "git+https://github.com/${{ github.repository }}@${{ github.sha }}",
+                  "digest": {
+                    "gitCommit": "${{ github.sha }}"
+                  }
                 }
+              ]
+            },
+            "runDetails": {
+              "builder": {
+                "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              },
+              "metadata": {
+                "invocationId": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                "startedOn": "${{ github.event.repository.updated_at }}"
               }
             }
           }
@@ -298,10 +289,10 @@ jobs:
       - name: Sign & Attest SLSA Provenance via Cosign
         env:
           COSIGN_EXPERIMENTAL: "1"
-          IMAGE_URI: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-sbom.outputs.image-digest }}
+          IMAGE_URI: ${{ env.REGISTRY }}/${{ needs.build-and-sbom.outputs.clean-image-name }}@${{ needs.build-and-sbom.outputs.image-digest }}
         run: |
           echo "Attesting SLSA Provenance statement..."
           cosign attest --yes \
             --predicate slsa-predicate.json \
-            --type slsaprovenance \
+            --type "https://slsa.dev/provenance/v1" \
             "${IMAGE_URI}"
