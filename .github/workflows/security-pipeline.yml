@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Scan Repository Dependencies with Trivy
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: "fs"
           ignore-unfixed: true
@@ -150,7 +150,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Scan Container Image for CVEs with Trivy
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}
           format: "table"
