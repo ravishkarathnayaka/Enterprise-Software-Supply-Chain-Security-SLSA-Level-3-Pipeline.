@@ -250,52 +250,37 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Construct in-toto SLSA Provenance Predicate
-        env:
-          IMAGE_DIGEST: ${{ needs.build-and-sbom.outputs.image-digest }}
-          CLEAN_NAME: ${{ needs.build-and-sbom.outputs.clean-image-name }}
+      - name: Construct SLSA Provenance Predicate
         run: |
           cat <<EOF > slsa-predicate.json
           {
-            "_type": "https://in-toto.io/Statement/v1",
-            "subject": [
-              {
-                "name": "${{ env.REGISTRY }}/${CLEAN_NAME}",
-                "digest": {
-                  "sha256": "${IMAGE_DIGEST#sha256:}"
-                }
-              }
-            ],
-            "predicateType": "https://slsa.dev/provenance/v1",
-            "predicate": {
-              "buildDefinition": {
-                "buildType": "https://actions.github.com/buildtypes/v1",
-                "externalParameters": {
-                  "workflow": "${{ github.workflow }}",
-                  "repository": "${{ github.repository }}",
-                  "ref": "${{ github.ref }}"
-                },
-                "internalParameters": {
-                  "runId": "${{ github.run_id }}",
-                  "attempt": "${{ github.run_attempt }}"
-                },
-                "resolvedDependencies": [
-                  {
-                    "uri": "git+https://github.com/${{ github.repository }}@${{ github.sha }}",
-                    "digest": {
-                      "gitCommit": "${{ github.sha }}"
-                    }
-                  }
-                ]
+            "buildDefinition": {
+              "buildType": "https://actions.github.com/buildtypes/v1",
+              "externalParameters": {
+                "workflow": "${{ github.workflow }}",
+                "repository": "${{ github.repository }}",
+                "ref": "${{ github.ref }}"
               },
-              "runDetails": {
-                "builder": {
-                  "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                },
-                "metadata": {
-                  "invocationId": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-                  "startedOn": "${{ github.event.repository.updated_at }}"
+              "internalParameters": {
+                "runId": "${{ github.run_id }}",
+                "attempt": "${{ github.run_attempt }}"
+              },
+              "resolvedDependencies": [
+                {
+                  "uri": "git+https://github.com/${{ github.repository }}@${{ github.sha }}",
+                  "digest": {
+                    "gitCommit": "${{ github.sha }}"
+                  }
                 }
+              ]
+            },
+            "runDetails": {
+              "builder": {
+                "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              },
+              "metadata": {
+                "invocationId": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                "startedOn": "${{ github.event.repository.updated_at }}"
               }
             }
           }
@@ -309,5 +294,5 @@ jobs:
           echo "Attesting SLSA Provenance statement..."
           cosign attest --yes \
             --predicate slsa-predicate.json \
-            --type slsaprovenance \
+            --type "https://slsa.dev/provenance/v1" \
             "${IMAGE_URI}"
