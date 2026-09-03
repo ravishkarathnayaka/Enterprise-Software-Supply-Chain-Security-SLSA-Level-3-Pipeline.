@@ -1,14 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enterprise DevSecOps & SLSA Level 3 Evidence Portal</title>
+  <title>Enterprise Software Supply Chain Security & SLSA Level 3 Pipeline</title>
+  <meta name="description" content="Production-grade DevSecOps pipeline with SLSA Level 3 compliance, Sigstore keyless signing, and Kyverno Kubernetes admission control.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>if (!window.tailwind) { document.write('<script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"><\/script>'); }</script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-accent {
+      background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glow {
+      box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.25);
+    }
     .pulse-dot {
       display: inline-block;
       width: 8px;
@@ -25,495 +70,518 @@
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 antialiased p-4 md:p-8 min-h-screen">
-  <div class="max-w-7xl mx-auto space-y-6">
+<body class="bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-slate-950">
 
-    <!-- Header & Hero -->
-    <header class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-sm">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  <!-- Glow background orb -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 blur-[130px] -z-10 pointer-events-none"></div>
+  <div class="fixed top-[600px] right-0 w-[500px] h-[400px] bg-blue-500/10 blur-[150px] -z-10 pointer-events-none"></div>
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-5 h-5 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="pulse-dot"></span>
-            <span class="text-xs font-semibold tracking-wider uppercase text-emerald-400">Live Production Attestation</span>
-            <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">SLSA Level 3 Certified</span>
-          </div>
-          <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white">Enterprise Supply Chain Security & SLSA L3 Pipeline</h1>
-          <p class="text-sm text-slate-400 mt-1">Zero-Cost End-to-End DevSecOps, Sigstore Keyless Signing, and Kubernetes Admission Control</p>
-        </div>
-        <div class="flex items-center gap-3 flex-wrap">
-          <a href="https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline./actions/runs/33719407728" target="_blank" class="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 transition shadow-md shadow-emerald-900/30">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-            Live GitHub Actions #33719407728
-          </a>
-          <a href="https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline." target="_blank" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 transition border border-slate-700">
-            Repository Source
-          </a>
+          <span class="font-bold text-sm tracking-tight text-white block">DevSecOps Shield</span>
+          <span class="text-[11px] text-emerald-400 font-mono block -mt-0.5">SLSA Level 3 Certified</span>
         </div>
       </div>
 
-      <!-- Quick Metrics Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-6 border-t border-slate-800">
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          <p class="text-xs text-slate-400 uppercase tracking-wider">SLSA Level</p>
-          <p class="text-lg font-bold text-emerald-400 mt-1">Level 3</p>
-          <p class="text-[10px] text-slate-500">Non-falsifiable OIDC</p>
-        </div>
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          <p class="text-xs text-slate-400 uppercase tracking-wider">Trivy CVEs</p>
-          <p class="text-lg font-bold text-emerald-400 mt-1">0 Critical / High</p>
-          <p class="text-[10px] text-slate-500">Clean Distroless Base</p>
-        </div>
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          <p class="text-xs text-slate-400 uppercase tracking-wider">Gitleaks Secrets</p>
-          <p class="text-lg font-bold text-emerald-400 mt-1">0 Leaks</p>
-          <p class="text-[10px] text-slate-500">History Verified</p>
-        </div>
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          <p class="text-xs text-slate-400 uppercase tracking-wider">Semgrep SAST</p>
-          <p class="text-lg font-bold text-emerald-400 mt-1">0 Flaws</p>
-          <p class="text-[10px] text-slate-500">OWASP Top 10 Guard</p>
-        </div>
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          <p class="text-xs text-slate-400 uppercase tracking-wider">Signing Mode</p>
-          <p class="text-lg font-bold text-blue-400 mt-1">Sigstore</p>
-          <p class="text-[10px] text-slate-500">Keyless Fulcio + Rekor</p>
-        </div>
-        <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          <p class="text-xs text-slate-400 uppercase tracking-wider">Admission Gate</p>
-          <p class="text-lg font-bold text-purple-400 mt-1">Kyverno PSS</p>
-          <p class="text-[10px] text-slate-500">Restricted Enforcement</p>
-        </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
+        <a href="#pipeline" class="hover:text-white transition">Pipeline Architecture</a>
+        <a href="#simulator" class="hover:text-white transition">Admission Simulator</a>
+        <a href="#slsa" class="hover:text-white transition">SLSA Compliance</a>
+        <a href="#evidence" class="hover:text-white transition">Attestations &amp; SBOM</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline." target="_blank" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition flex items-center gap-2 border border-slate-700">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline./actions/runs/33719407728" target="_blank" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/30">
+          <span class="w-2 h-2 rounded-full bg-slate-950 animate-pulse"></span>
+          Live CI Run #33719407728
+        </a>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="flex space-x-2 border-b border-slate-800 pb-2 overflow-x-auto">
-      <button onclick="switchTab('pipeline')" id="tab-btn-pipeline" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white transition">CI/CD Pipeline Stages</button>
-      <button onclick="switchTab('admission')" id="tab-btn-admission" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition">Kyverno Admission Simulator</button>
-      <button onclick="switchTab('provenance')" id="tab-btn-provenance" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition">SLSA L3 Provenance & Cosign</button>
-      <button onclick="switchTab('sbom')" id="tab-btn-sbom" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition">Dual-Format SBOM Explorer</button>
-      <button onclick="switchTab('api')" id="tab-btn-api" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition">Microservice API Live Test</button>
-    </nav>
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 text-center relative">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-6">
+      <span class="pulse-dot"></span>
+      <span>Zero-Cost Production DevSecOps Reference Implementation</span>
+    </div>
 
-    <!-- TAB 1: Pipeline Stages -->
-    <section id="tab-pipeline" class="tab-content active space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-lg font-bold text-white mb-1">7-Stage DevSecOps Pipeline Walkthrough</h2>
-        <p class="text-sm text-slate-400 mb-6">Click any stage below to inspect runtime parameters, scan outputs, and verification evidence.</p>
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.15]">
+      Zero-Trust Supply Chain Security. <br class="hidden sm:inline">
+      <span class="gradient-accent">Automated from Commit to Kubernetes.</span>
+    </h1>
 
-        <div class="grid grid-cols-1 md:grid-cols-7 gap-3 mb-6">
-          <button onclick="showStage(1)" id="stage-btn-1" class="stage-btn text-left p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 transition">
-            <span class="text-[10px] font-mono text-emerald-400 block">STAGE 1</span>
-            <span class="text-xs font-bold text-white block mt-0.5">Gitleaks</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ 0 Secrets</span>
-          </button>
-          <button onclick="showStage(2)" id="stage-btn-2" class="stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition">
-            <span class="text-[10px] font-mono text-slate-400 block">STAGE 2</span>
-            <span class="text-xs font-bold text-white block mt-0.5">Semgrep</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ OWASP Pass</span>
-          </button>
-          <button onclick="showStage(3)" id="stage-btn-3" class="stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition">
-            <span class="text-[10px] font-mono text-slate-400 block">STAGE 3</span>
-            <span class="text-xs font-bold text-white block mt-0.5">Trivy SCA</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ 0 CVEs</span>
-          </button>
-          <button onclick="showStage(4)" id="stage-btn-4" class="stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition">
-            <span class="text-[10px] font-mono text-slate-400 block">STAGE 4</span>
-            <span class="text-xs font-bold text-white block mt-0.5">Distroless</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ UID 65532</span>
-          </button>
-          <button onclick="showStage(5)" id="stage-btn-5" class="stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition">
-            <span class="text-[10px] font-mono text-slate-400 block">STAGE 5</span>
-            <span class="text-xs font-bold text-white block mt-0.5">Syft SBOM</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ SPDX + CDX</span>
-          </button>
-          <button onclick="showStage(6)" id="stage-btn-6" class="stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition">
-            <span class="text-[10px] font-mono text-slate-400 block">STAGE 6</span>
-            <span class="text-xs font-bold text-white block mt-0.5">Sigstore</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ Keyless Sign</span>
-          </button>
-          <button onclick="showStage(7)" id="stage-btn-7" class="stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition">
-            <span class="text-[10px] font-mono text-slate-400 block">STAGE 7</span>
-            <span class="text-xs font-bold text-white block mt-0.5">SLSA L3</span>
-            <span class="text-[10px] text-emerald-400 block mt-1">✔ In-Toto L3</span>
-          </button>
-        </div>
+    <p class="mt-6 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+      A battle-tested CI/CD pipeline preventing supply chain attacks. Enforces <strong class="text-white">SLSA Level 3 Provenance</strong>, <strong class="text-white">Sigstore Keyless Signing</strong>, <strong class="text-white">Distroless Hardening</strong>, and <strong class="text-white">Kyverno Admission Control</strong>.
+    </p>
 
-        <!-- Dynamic Stage Details View -->
-        <div id="stage-details" class="bg-slate-950 border border-slate-800 rounded-xl p-5 font-mono text-xs">
-          <!-- Populated by JS -->
-        </div>
+    <!-- Key Metrics Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-12 text-left">
+      <div class="glass-card rounded-2xl p-4 transition">
+        <span class="text-xs text-slate-400 font-mono block">PROVENANCE</span>
+        <div class="text-2xl font-extrabold text-emerald-400 mt-1">SLSA L3</div>
+        <p class="text-xs text-slate-400 mt-1">Non-falsifiable in-toto signed via GitHub OIDC</p>
       </div>
-    </section>
+      <div class="glass-card rounded-2xl p-4 transition">
+        <span class="text-xs text-slate-400 font-mono block">VULNERABILITY SCAN</span>
+        <div class="text-2xl font-extrabold text-emerald-400 mt-1">0 CVEs</div>
+        <p class="text-xs text-slate-400 mt-1">Distroless Debian 12 with non-root UID 65532</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4 transition">
+        <span class="text-xs text-slate-400 font-mono block">CRYPTOGRAPHIC SIGNATURE</span>
+        <div class="text-2xl font-extrabold text-teal-400 mt-1">Sigstore</div>
+        <p class="text-xs text-slate-400 mt-1">Keyless Cosign verification in Rekor transparency log</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4 transition">
+        <span class="text-xs text-slate-400 font-mono block">RUNTIME ADMISSION</span>
+        <div class="text-2xl font-extrabold text-purple-400 mt-1">Kyverno PSS</div>
+        <p class="text-xs text-slate-400 mt-1">Restricted profile blocking unsigned or root pods</p>
+      </div>
+    </div>
+  </section>
 
-    <!-- TAB 2: Kyverno Admission Simulator -->
-    <section id="tab-admission" class="tab-content space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-lg font-bold text-white mb-1">Kubernetes Admission Control Test Harness (Kyverno)</h2>
-        <p class="text-sm text-slate-400 mb-6">Interactive simulator replicating the positive and negative test cases executed by <code class="text-emerald-400">scripts/verify_admission.sh</code>.</p>
+  <!-- Interactive 7-Stage Pipeline Explorer -->
+  <section id="pipeline" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-emerald-400">Continuous Security Pipeline</h2>
+      <p class="text-3xl font-bold text-white mt-1">7 Stages of Defense-in-Depth</p>
+      <p class="text-sm text-slate-400 mt-2">Click any stage below to inspect the real-world tooling, scan parameters, and cryptographic outputs from the pipeline.</p>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <button onclick="simulateAdmission('privileged')" class="p-4 rounded-xl border border-red-500/30 hover:border-red-500 bg-red-500/5 text-left transition">
-            <span class="text-xs font-bold text-red-400 block">TEST CASE 1</span>
-            <span class="text-sm font-semibold text-white block mt-1">Privileged Pod</span>
-            <span class="text-xs text-slate-400 block mt-1">securityContext.privileged: true</span>
-            <span class="inline-block mt-3 px-2 py-0.5 text-[10px] rounded bg-red-500/20 text-red-400 font-mono">Expect: 403 Blocked</span>
-          </button>
-          <button onclick="simulateAdmission('writable_rootfs')" class="p-4 rounded-xl border border-red-500/30 hover:border-red-500 bg-red-500/5 text-left transition">
-            <span class="text-xs font-bold text-red-400 block">TEST CASE 2</span>
-            <span class="text-sm font-semibold text-white block mt-1">Writable RootFS</span>
-            <span class="text-xs text-slate-400 block mt-1">readOnlyRootFilesystem: false</span>
-            <span class="inline-block mt-3 px-2 py-0.5 text-[10px] rounded bg-red-500/20 text-red-400 font-mono">Expect: 403 Blocked</span>
-          </button>
-          <button onclick="simulateAdmission('unsigned_image')" class="p-4 rounded-xl border border-amber-500/30 hover:border-amber-500 bg-amber-500/5 text-left transition">
-            <span class="text-xs font-bold text-amber-400 block">TEST CASE 3</span>
-            <span class="text-sm font-semibold text-white block mt-1">Unsigned Image</span>
-            <span class="text-xs text-slate-400 block mt-1">alpine:latest (no signature)</span>
-            <span class="inline-block mt-3 px-2 py-0.5 text-[10px] rounded bg-amber-500/20 text-amber-400 font-mono">Expect: Signature Missing</span>
-          </button>
-          <button onclick="simulateAdmission('compliant')" class="p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/5 text-left transition">
-            <span class="text-xs font-bold text-emerald-400 block">TEST CASE 4</span>
-            <span class="text-sm font-semibold text-white block mt-1">Hardened & Signed</span>
-            <span class="text-xs text-slate-400 block mt-1">Distroless UID 65532 + Cosign</span>
-            <span class="inline-block mt-3 px-2 py-0.5 text-[10px] rounded bg-emerald-500/20 text-emerald-400 font-mono">Expect: 200 Admitted</span>
-          </button>
-        </div>
+    <!-- Stepper Buttons -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
+      <button onclick="selectStage(1)" id="btn-s1" class="stage-nav-btn p-3.5 rounded-xl border border-emerald-500 bg-emerald-500/10 text-left transition">
+        <span class="text-[10px] font-mono text-emerald-400 block font-semibold">STAGE 1</span>
+        <span class="text-xs font-bold text-white block mt-0.5">Gitleaks</span>
+        <span class="text-[11px] text-emerald-400 block mt-1">✔ 0 Secrets</span>
+      </button>
+      <button onclick="selectStage(2)" id="btn-s2" class="stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition">
+        <span class="text-[10px] font-mono text-slate-400 block font-semibold">STAGE 2</span>
+        <span class="text-xs font-bold text-white block mt-0.5">Semgrep SAST</span>
+        <span class="text-[11px] text-slate-400 block mt-1">✔ OWASP Pass</span>
+      </button>
+      <button onclick="selectStage(3)" id="btn-s3" class="stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition">
+        <span class="text-[10px] font-mono text-slate-400 block font-semibold">STAGE 3</span>
+        <span class="text-xs font-bold text-white block mt-0.5">Trivy SCA</span>
+        <span class="text-[11px] text-slate-400 block mt-1">✔ 0 Vulnerabilities</span>
+      </button>
+      <button onclick="selectStage(4)" id="btn-s4" class="stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition">
+        <span class="text-[10px] font-mono text-slate-400 block font-semibold">STAGE 4</span>
+        <span class="text-xs font-bold text-white block mt-0.5">Distroless</span>
+        <span class="text-[11px] text-slate-400 block mt-1">✔ UID 65532</span>
+      </button>
+      <button onclick="selectStage(5)" id="btn-s5" class="stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition">
+        <span class="text-[10px] font-mono text-slate-400 block font-semibold">STAGE 5</span>
+        <span class="text-xs font-bold text-white block mt-0.5">Syft SBOM</span>
+        <span class="text-[11px] text-slate-400 block mt-1">✔ SPDX &amp; CDX</span>
+      </button>
+      <button onclick="selectStage(6)" id="btn-s6" class="stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition">
+        <span class="text-[10px] font-mono text-slate-400 block font-semibold">STAGE 6</span>
+        <span class="text-xs font-bold text-white block mt-0.5">Sigstore Sign</span>
+        <span class="text-[11px] text-slate-400 block mt-1">✔ Keyless Cosign</span>
+      </button>
+      <button onclick="selectStage(7)" id="btn-s7" class="stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition">
+        <span class="text-[10px] font-mono text-slate-400 block font-semibold">STAGE 7</span>
+        <span class="text-xs font-bold text-white block mt-0.5">SLSA Provenance</span>
+        <span class="text-[11px] text-slate-400 block mt-1">✔ Level 3 In-Toto</span>
+      </button>
+    </div>
 
-        <!-- Terminal Output Window -->
-        <div class="bg-black/95 text-emerald-400 rounded-xl p-4 border border-zinc-800 font-mono text-xs overflow-x-auto">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-zinc-800">
+    <!-- Active Stage Details Card -->
+    <div id="stage-panel" class="glass-card rounded-2xl p-6 transition">
+      <!-- Injected via JavaScript -->
+    </div>
+  </section>
+
+  <!-- Interactive Kubernetes Admission Controller Simulator -->
+  <section id="simulator" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-800/80">
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-medium mb-3">
+        <span>Runtime Admission Gating</span>
+      </div>
+      <h2 class="text-3xl font-bold text-white">Live Kyverno Admission Control Simulator</h2>
+      <p class="text-sm text-slate-400 mt-2">Test how Kubernetes Pod Security Standards (Restricted) and Kyverno image signature verification intercept attack vectors before pods are admitted to nodes.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left: Simulation Scenarios -->
+      <div class="lg:col-span-4 space-y-3">
+        <p class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">Select Attack or Verification Scenario:</p>
+
+        <button onclick="runAdmissionDemo('privileged')" class="w-full p-4 rounded-xl border border-red-500/30 hover:border-red-500 bg-red-500/5 hover:bg-red-500/10 text-left transition flex items-start justify-between group">
+          <div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
-              <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-              <span class="text-xs text-zinc-400 ml-2">kubectl apply admission review</span>
+              <span class="w-2 h-2 rounded-full bg-red-500"></span>
+              <span class="text-xs font-bold text-red-400">Attack 1: Privileged Pod</span>
             </div>
-            <span class="text-zinc-500 text-[10px]">namespace: secure-workloads</span>
+            <p class="text-xs text-slate-300 font-mono mt-1.5">securityContext.privileged: true</p>
+            <p class="text-[11px] text-slate-500 mt-1">Attempts host container breakout</p>
           </div>
-          <pre id="admission-terminal" class="whitespace-pre-wrap leading-relaxed">Select a test case above to trigger simulated Kyverno admission controller webhook verification...</pre>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-mono">Blocked</span>
+        </button>
+
+        <button onclick="runAdmissionDemo('writable_rootfs')" class="w-full p-4 rounded-xl border border-red-500/30 hover:border-red-500 bg-red-500/5 hover:bg-red-500/10 text-left transition flex items-start justify-between group">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-red-500"></span>
+              <span class="text-xs font-bold text-red-400">Attack 2: Writable RootFS</span>
+            </div>
+            <p class="text-xs text-slate-300 font-mono mt-1.5">readOnlyRootFilesystem: false</p>
+            <p class="text-[11px] text-slate-500 mt-1">Allows malware persistence</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-mono">Blocked</span>
+        </button>
+
+        <button onclick="runAdmissionDemo('unsigned_image')" class="w-full p-4 rounded-xl border border-amber-500/30 hover:border-amber-500 bg-amber-500/5 hover:bg-amber-500/10 text-left transition flex items-start justify-between group">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span class="text-xs font-bold text-amber-400">Attack 3: Unsigned Image</span>
+            </div>
+            <p class="text-xs text-slate-300 font-mono mt-1.5">image: untrusted-app:unsigned</p>
+            <p class="text-[11px] text-slate-500 mt-1">Unverified supply chain origin</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">Blocked</span>
+        </button>
+
+        <button onclick="runAdmissionDemo('compliant')" class="w-full p-4 rounded-xl border border-emerald-500/30 hover:border-emerald-500 bg-emerald-500/5 hover:bg-emerald-500/10 text-left transition flex items-start justify-between group">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-bold text-emerald-400">Verified: Hardened &amp; Signed</span>
+            </div>
+            <p class="text-xs text-slate-300 font-mono mt-1.5">Distroless UID 65532 + Cosign</p>
+            <p class="text-[11px] text-slate-500 mt-1">Complies with all ClusterPolicies</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">Admitted</span>
+        </button>
+      </div>
+
+      <!-- Right: Real Terminal Output -->
+      <div class="lg:col-span-8">
+        <div class="rounded-2xl border border-slate-800 bg-black/90 shadow-2xl overflow-hidden font-mono text-xs h-full flex flex-col">
+          <div class="px-4 py-3 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500"></span>
+              <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              <span class="text-xs text-slate-400 font-medium ml-2">kubernetes-api &bull; webhook/validate.kyverno.svc</span>
+            </div>
+            <span class="text-[11px] text-slate-500">namespace: secure-workloads</span>
+          </div>
+          <div class="p-5 flex-1 overflow-x-auto text-slate-300 leading-relaxed" id="terminal-content">
+            <span class="text-slate-500"># Choose an attack or verification scenario on the left to simulate admission webhook response...</span>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- TAB 3: SLSA L3 Provenance & Cosign -->
-    <section id="tab-provenance" class="tab-content space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-lg font-bold text-white mb-1">Cryptographic Provenance (In-Toto & Sigstore)</h2>
-        <p class="text-sm text-slate-400 mb-6">Cryptographically verified statement generated during the GitHub Actions workflow run.</p>
+  <!-- SLSA Level 3 Compliance Matrix -->
+  <section id="slsa" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-800/80">
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-emerald-400">Framework Alignment</h2>
+      <p class="text-3xl font-bold text-white mt-1">SLSA Level 3 Compliance Matrix</p>
+      <p class="text-sm text-slate-400 mt-2">Every requirement of the Supply-chain Levels for Software Artifacts (SLSA) v1.0 standard enforced programmatically.</p>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div class="p-4 rounded-xl border border-slate-800 bg-slate-950">
-            <span class="text-xs text-slate-400">OIDC Identity Issuer</span>
-            <p class="text-xs font-mono font-bold text-white mt-1 break-all">https://token.actions.githubusercontent.com</p>
-          </div>
-          <div class="p-4 rounded-xl border border-slate-800 bg-slate-950">
-            <span class="text-xs text-slate-400">Sigstore Rekor Transparency Log</span>
-            <p class="text-xs font-mono font-bold text-emerald-400 mt-1">Recorded &amp; Immutable</p>
-          </div>
-          <div class="p-4 rounded-xl border border-slate-800 bg-slate-950">
-            <span class="text-xs text-slate-400">SLSA Specification</span>
-            <p class="text-xs font-mono font-bold text-blue-400 mt-1">https://slsa.dev/provenance/v1</p>
-          </div>
+    <div class="glass-card rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-mono uppercase">
+            <tr>
+              <th class="p-4">SLSA Requirement</th>
+              <th class="p-4">Industry Standard Specification</th>
+              <th class="p-4">How This Pipeline Implements It</th>
+              <th class="p-4 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">
+            <tr>
+              <td class="p-4 font-bold text-white">Source Integrity</td>
+              <td class="p-4 text-slate-300">Version controlled, linear change history</td>
+              <td class="p-4 text-slate-400">GitHub branch protection, required status checks, signed commits</td>
+              <td class="p-4 text-right"><span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-semibold font-mono text-[11px]">Enforced</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white">Isolated Build Service</td>
+              <td class="p-4 text-slate-300">Builds execute on ephemeral, dedicated virtual machines</td>
+              <td class="p-4 text-slate-400">GitHub-hosted <code class="text-emerald-400">ubuntu-latest</code> runners destroyed after execution</td>
+              <td class="p-4 text-right"><span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-semibold font-mono text-[11px]">Enforced</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white">Hermetic Dependencies</td>
+              <td class="p-4 text-slate-300">Tamper-evident, locked dependencies</td>
+              <td class="p-4 text-slate-400">Python exact pinning with SHA256 hashes; Distroless base image</td>
+              <td class="p-4 text-right"><span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-semibold font-mono text-[11px]">Enforced</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white">Non-Falsifiable Provenance</td>
+              <td class="p-4 text-slate-300">Provenance generated by build platform identity, not developer</td>
+              <td class="p-4 text-slate-400">Ambient GitHub OIDC (<code class="text-emerald-400">id-token: write</code>) attested via Sigstore Fulcio</td>
+              <td class="p-4 text-right"><span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-semibold font-mono text-[11px]">Enforced</span></td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-white">Cryptographic Verification</td>
+              <td class="p-4 text-slate-300">Container runtime rejects unsigned or non-provenance artifacts</td>
+              <td class="p-4 text-slate-400">Kyverno <code class="text-emerald-400">verifyImages</code> rule interrogates Rekor transparency log</td>
+              <td class="p-4 text-right"><span class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 font-semibold font-mono text-[11px]">Enforced</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Artifacts & Evidence -->
+  <section id="evidence" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-800/80">
+    <div class="text-center max-w-3xl mx-auto mb-10">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-emerald-400">Attestations &amp; Catalog</h2>
+      <p class="text-3xl font-bold text-white mt-1">Cryptographic Evidence &amp; Dual SBOM</p>
+      <p class="text-sm text-slate-400 mt-2">Inspect the real in-toto Statement and the software bill of materials catalog generated for this build.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- In-toto SLSA Statement Viewer -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+          <span class="text-sm font-bold text-white">in-toto SLSA Level 3 Statement</span>
+          <span class="text-xs font-mono text-emerald-400">Rekor Log #24296</span>
         </div>
-
-        <div class="bg-black/95 text-zinc-200 rounded-xl p-4 font-mono text-xs overflow-x-auto border border-zinc-800">
-          <div class="text-xs text-zinc-400 pb-2 mb-2 border-b border-zinc-800 flex justify-between">
-            <span>in-toto SLSA Level 3 Statement Payload</span>
-            <span class="text-emerald-400">Verified via Cosign</span>
-          </div>
-          <pre class="text-emerald-300">{
+        <pre class="bg-black/80 rounded-xl p-4 text-[11px] font-mono text-emerald-300 overflow-x-auto leading-relaxed border border-slate-800/60">{
   "_type": "https://in-toto.io/Statement/v1",
-  "subject": [
-    {
-      "name": "ghcr.io/ravishkarathnayaka/enterprise-software-supply-chain-security-slsa-level-3-pipeline",
-      "digest": {
-        "sha256": "46b280b70a464c77841e8a0c71822f7b88df126b8e39ad89b51aa419f5dfb8d2"
-      }
+  "subject": [{
+    "name": "ghcr.io/ravishkarathnayaka/enterprise-software-supply-chain-security-slsa-level-3-pipeline",
+    "digest": {
+      "sha256": "46b280b70a464c77841e8a0c71822f7b88df126b8e39ad89b51aa419f5dfb8d2"
     }
-  ],
+  }],
   "predicateType": "https://slsa.dev/provenance/v1",
   "predicate": {
     "buildDefinition": {
       "buildType": "https://actions.github.com/buildtypes/v1",
       "externalParameters": {
-        "workflow": "Enterprise Security & SLSA Level 3 Pipeline",
         "repository": "ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline.",
         "ref": "refs/heads/main"
-      },
-      "internalParameters": {
-        "runner": "ubuntu-latest",
-        "isolation": "ephemeral-container"
       }
     },
     "runDetails": {
       "builder": {
-        "id": "https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline./actions/runs/33719407728"
+        "id": "https://github.com/.../actions/runs/33719407728"
       }
     }
   }
 }</pre>
-        </div>
       </div>
-    </section>
 
-    <!-- TAB 4: Dual SBOM Explorer -->
-    <section id="tab-sbom" class="tab-content space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-lg font-bold text-white mb-1">Dual-Format Software Bill of Materials (SBOM)</h2>
-        <p class="text-sm text-slate-400 mb-6">Generated automatically by Anchore Syft during Stage 5 of the pipeline.</p>
-
-        <div class="overflow-x-auto border border-slate-800 rounded-xl">
-          <table class="w-full text-xs text-left">
-            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
-              <tr>
-                <th class="p-3">Package</th>
-                <th class="p-3">Version</th>
-                <th class="p-3">Ecosystem</th>
-                <th class="p-3">License</th>
-                <th class="p-3">Vulnerability Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800">
-              <tr>
-                <td class="p-3 font-mono font-semibold text-emerald-400">fastapi</td>
-                <td class="p-3 font-mono">0.115.0</td>
-                <td class="p-3">Python (PyPI)</td>
-                <td class="p-3">MIT</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">0 CVEs</span></td>
-              </tr>
-              <tr>
-                <td class="p-3 font-mono font-semibold text-emerald-400">pydantic</td>
-                <td class="p-3 font-mono">2.9.2</td>
-                <td class="p-3">Python (PyPI)</td>
-                <td class="p-3">MIT</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">0 CVEs</span></td>
-              </tr>
-              <tr>
-                <td class="p-3 font-mono font-semibold text-emerald-400">uvicorn</td>
-                <td class="p-3 font-mono">0.30.6</td>
-                <td class="p-3">Python (PyPI)</td>
-                <td class="p-3">BSD-3-Clause</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">0 CVEs</span></td>
-              </tr>
-              <tr>
-                <td class="p-3 font-mono font-semibold text-emerald-400">distroless/python3-debian12</td>
-                <td class="p-3 font-mono">bookworm-nonroot</td>
-                <td class="p-3">Debian (Minimal)</td>
-                <td class="p-3">Various (OS)</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-semibold">0 CVEs</span></td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- SBOM Catalog -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+          <span class="text-sm font-bold text-white">Software Bill of Materials (Syft)</span>
+          <span class="text-xs font-mono text-emerald-400">Dual: SPDX 2.3 + CycloneDX 1.5</span>
         </div>
-      </div>
-    </section>
-
-    <!-- TAB 5: Live API Playground -->
-    <section id="tab-api" class="tab-content space-y-4">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-        <h2 class="text-lg font-bold text-white mb-1">Microservice API Simulation Playground</h2>
-        <p class="text-sm text-slate-400 mb-6">Test the FastAPI security middleware, input validation, and probes directly.</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-          <button onclick="testAPI('health')" class="p-3 rounded-xl border border-slate-800 hover:border-emerald-500 text-left bg-slate-950 transition">
-            <span class="text-[10px] font-mono text-blue-400">GET /healthz</span>
-            <span class="text-xs font-semibold block mt-1">Liveness Probe</span>
-          </button>
-          <button onclick="testAPI('info')" class="p-3 rounded-xl border border-slate-800 hover:border-emerald-500 text-left bg-slate-950 transition">
-            <span class="text-[10px] font-mono text-blue-400">GET /api/v1/info</span>
-            <span class="text-xs font-semibold block mt-1">SLSA Metadata</span>
-          </button>
-          <button onclick="testAPI('valid_post')" class="p-3 rounded-xl border border-emerald-500/30 hover:border-emerald-500 text-left bg-emerald-500/5 transition">
-            <span class="text-[10px] font-mono text-emerald-400">POST /api/v1/verify-data</span>
-            <span class="text-xs font-semibold block mt-1">Valid Payload</span>
-          </button>
-          <button onclick="testAPI('malicious_post')" class="p-3 rounded-xl border border-red-500/30 hover:border-red-500 text-left bg-red-500/5 transition">
-            <span class="text-[10px] font-mono text-red-400">POST (Injection Attack)</span>
-            <span class="text-xs font-semibold block mt-1">Path Traversal Attempt</span>
-          </button>
-        </div>
-
-        <div class="bg-black/95 text-zinc-200 rounded-xl p-4 font-mono text-xs border border-zinc-800">
-          <div class="text-xs text-zinc-400 pb-2 mb-2 border-b border-zinc-800 flex justify-between">
-            <span id="api-request-title">HTTP Response Inspector</span>
-            <span id="api-status-badge" class="px-2 py-0.5 rounded text-[10px] bg-zinc-800 text-zinc-400">Ready</span>
+        <div class="space-y-2">
+          <div class="p-3 bg-slate-900/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+            <div>
+              <span class="font-bold text-white">fastapi</span>
+              <span class="text-slate-400 ml-2">v0.115.0</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">MIT</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">0 CVEs</span>
+            </div>
           </div>
-          <pre id="api-response-body" class="text-emerald-300">Click one of the API buttons above to inspect live request/response simulation...</pre>
+          <div class="p-3 bg-slate-900/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+            <div>
+              <span class="font-bold text-white">pydantic</span>
+              <span class="text-slate-400 ml-2">v2.9.2</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">MIT</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">0 CVEs</span>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-900/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+            <div>
+              <span class="font-bold text-white">uvicorn</span>
+              <span class="text-slate-400 ml-2">v0.30.6</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">BSD-3-Clause</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">0 CVEs</span>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-900/70 rounded-xl border border-slate-800 flex items-center justify-between text-xs font-mono">
+            <div>
+              <span class="font-bold text-white">distroless/python3-debian12</span>
+              <span class="text-slate-400 ml-2">nonroot</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-slate-400">Debian Minimal</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">0 CVEs</span>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-  </div>
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-10 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <p>&copy; 2026 Ravishka Prabhath Rathnayaka. Open source under Apache 2.0 License.</p>
+      <div class="flex items-center gap-4">
+        <a href="https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline." target="_blank" class="hover:text-white transition">GitHub Repository</a>
+        <a href="https://slsa.dev" target="_blank" class="hover:text-white transition">SLSA Framework</a>
+        <a href="https://sigstore.dev" target="_blank" class="hover:text-white transition">Sigstore Cosign</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    const stages = {
+    const pipelineData = {
       1: {
-        title: "Stage 1: Gitleaks Secret Detection",
-        tool: "Gitleaks v8 Engine (github-action)",
+        title: "Stage 1: Secret Scanning (Gitleaks Engine)",
+        tag: "Pre-Build Hygiene",
         status: "PASSED (Zero Secrets Detected)",
-        cmd: "gitleaks detect --source . --config security/gitleaks/.gitleaks.toml --verbose",
-        output: "[INFO] Scanning repository history: 25 files, commits scanned.\n[SUCCESS] No leaks detected in commit history.\n[POLICY] Custom Sigstore and enterprise token rules satisfied.\nStatus: SUCCESS (Exit Code: 0)"
+        summary: "Scans entire git history to catch accidental credentials, API keys, private keys, or internal tokens before code can be built.",
+        tool: "Gitleaks v8 with custom ruleset (.gitleaks.toml)",
+        result: "✔ Scanned 25 files across all commits\n✔ Verified 0 secrets detected\n✔ Enforced custom Sigstore key detection"
       },
       2: {
-        title: "Stage 2: Semgrep OWASP SAST Analysis",
-        tool: "Semgrep Core Engine",
-        status: "PASSED (Zero Findings)",
-        cmd: "semgrep scan --config p/owasp-top-ten --config security/semgrep/rules.yml --sarif",
-        output: "[INFO] Running 47 rules across Python codebase...\n[INFO] Checking: Command Injection, Code Injection, SSRF, Path Traversal...\n[SUCCESS] 0 findings across 2 source files.\n[UPLOAD] Uploaded SARIF report to GitHub Security Center (CodeQL Action v4).\nStatus: SUCCESS (Exit Code: 0)"
+        title: "Stage 2: Static Analysis (Semgrep SAST)",
+        tag: "Code Level Protection",
+        status: "PASSED (Zero Flaws Detected)",
+        summary: "Automated static analysis auditing Python codebase against OWASP Top 10 injection, SSRF, and path traversal rules.",
+        tool: "Semgrep Core + Custom rules (security/semgrep/rules.yml)",
+        result: "✔ Scanned Python AST against 47 security rules\n✔ Checked for command injection (shell=True), eval, pickle\n✔ Exported SARIF to GitHub Code Scanning"
       },
       3: {
-        title: "Stage 3: Trivy Dependency & License SCA",
+        title: "Stage 3: Dependency Vulnerability Audit (Trivy SCA)",
+        tag: "Supply Chain Hygiene",
+        status: "PASSED (0 High/Critical CVEs)",
+        summary: "Audits Python dependencies and transitive packages against national vulnerability databases to reject known vulnerabilities.",
         tool: "Aqua Security Trivy CLI v0.55+",
-        status: "PASSED (Zero Vulnerabilities)",
-        cmd: "trivy fs --severity HIGH,CRITICAL --ignore-unfixed --exit-code 0 .",
-        output: "2026-09-03T05:31:00Z INFO Vulnerability scanning enabled (Python PyPI, pip)\nTotal dependencies scanned: 17\n+----------------------+------------------+----------+-------------------+---------------+-----------------------+\n|       LIBRARY        | VULNERABILITY ID | SEVERITY | INSTALLED VERSION | FIXED VERSION |         TITLE         |\n+----------------------+------------------+----------+-------------------+---------------+-----------------------+\n| None detected        |                  |          |                   |               | Clean dependencies    |\n+----------------------+------------------+----------+-------------------+---------------+-----------------------+\nStatus: SUCCESS (Exit Code: 0)"
+        result: "✔ Scanned 17 pinned packages\n✔ Verified 0 Critical or High severity CVEs\n✔ Validated license compatibility (MIT, BSD-3)"
       },
       4: {
-        title: "Stage 4: Hardened Multi-Stage Distroless Build",
-        tool: "Docker Buildx + Google Distroless",
+        title: "Stage 4: Container Hardening & Distroless Build",
+        tag: "Minimal Attack Surface",
         status: "PASSED (UID 65532, No-Shell)",
-        cmd: "docker build -t ghcr.io/.../enterprise-pipeline:latest ./app",
-        output: "[+] Building 4.2s (12/12) FINISHED\n => [builder] python:3.11-slim-bookworm: compile wheels\n => [runtime] gcr.io/distroless/python3-debian12:nonroot: copy dependencies\n => Stripped /bin/sh and /bin/bash (Zero Shell Runtime)\n => Setting USER 65532:65532\n => Trivy container image scan: 0 Critical, 0 High\nStatus: SUCCESS (Digest: sha256:46b280b...)"
+        summary: "Builds a hardened container image on Google Distroless with non-root user UID 65532 and no shell binaries (/bin/sh removed).",
+        tool: "Docker Buildx + gcr.io/distroless/python3-debian12:nonroot",
+        result: "✔ Multi-stage compilation stripping build-time tools\n✔ Enforced read-only rootfs compatibility\n✔ Trivy image scan returned 0 CVEs"
       },
       5: {
         title: "Stage 5: Dual-Format SBOM Generation",
+        tag: "Transparency & Inventory",
+        status: "PASSED (SPDX & CycloneDX)",
+        summary: "Generates complete Software Bill of Materials in both industry formats, cataloging all OS libraries and Python packages.",
         tool: "Anchore Syft CLI v0.17.9",
-        status: "PASSED (SPDX 2.3 & CycloneDX 1.5)",
-        cmd: "syft ghcr.io/...@sha256:... -o spdx-json=sbom.spdx.json -o cyclonedx-json=sbom.cdx.json",
-        output: "[INFO] Cataloging container image packages...\n ✔ Loaded image\n ✔ Parsed 41 OS packages (Debian 12 minimal)\n ✔ Parsed 17 Python site-packages\n ✔ Wrote sbom.spdx.json (SPDX 2.3 JSON specification)\n ✔ Wrote sbom.cdx.json (CycloneDX 1.5 JSON specification)\nStatus: SUCCESS (Archived to GitHub Actions Artifacts)"
+        result: "✔ Generated sbom.spdx.json (SPDX 2.3 specification)\n✔ Generated sbom.cdx.json (CycloneDX 1.5 specification)\n✔ Uploaded as immutable GitHub Actions build artifact"
       },
       6: {
         title: "Stage 6: Sigstore Keyless Signing & Attestation",
-        tool: "Sigstore Cosign v3.7.0 (Fulcio & Rekor)",
-        status: "PASSED (Keyless OIDC Identity)",
-        cmd: "cosign sign --yes $IMAGE_URI && cosign attest --yes --predicate sbom.spdx.json $IMAGE_URI",
-        output: "Generating ephemeral certificate via Fulcio CA for GitHub Actions OIDC...\nCertificate issued to: https://github.com/ravishkarathnayaka/...\nPushing signature to ghcr.io/...:sha256-46b280b.sig\nRecording entry in Rekor transparency log (Entry ID: 24296...)\nAttesting SPDX SBOM predicate: sha256-46b280b.att\nVerification passed: valid cryptographic signature verified on Rekor.\nStatus: SUCCESS (Exit Code: 0)"
+        tag: "Cryptographic Immutability",
+        status: "PASSED (Fulcio OIDC + Rekor)",
+        summary: "Cryptographically signs container image using short-lived GitHub Actions OIDC identity without managing long-lived private keys.",
+        tool: "Sigstore Cosign v3.7.0",
+        result: "✔ Certificate generated via Fulcio Certificate Authority\n✔ Signature entry logged in public Rekor transparency log\n✔ Attached SPDX SBOM attestation to container in GHCR"
       },
       7: {
         title: "Stage 7: SLSA Level 3 Provenance Attestation",
-        tool: "In-Toto Statement & Cosign Attest",
+        tag: "Non-Falsifiable Build Origin",
         status: "PASSED (SLSA v1.0 Level 3)",
-        cmd: "cosign attest --yes --predicate slsa-predicate.json --type https://slsa.dev/provenance/v1 $IMAGE_URI",
-        output: "Constructed non-falsifiable in-toto SLSA Provenance envelope:\n- Subject: ghcr.io/...@sha256:46b280b...\n- Builder ID: GitHub Actions Hosted Runner (ubuntu-latest)\n- Commit SHA: 46b280b...\n- Rekor Log Index: verified\nStatus: SUCCESS (SLSA Level 3 Provenance Recorded)"
+        summary: "Constructs in-toto statement proving the image was produced by the exact source commit on ephemeral GitHub Actions runners.",
+        tool: "In-Toto Statement Specification v1 + Cosign Attest",
+        result: "✔ Bound container digest to GitHub commit SHA\n✔ Recorded builder workflow invocation ID\n✔ Attested SLSA v1 statement to OCI registry"
       }
     };
 
-    function showStage(num) {
-      document.querySelectorAll('.stage-btn').forEach((btn, idx) => {
+    function selectStage(num) {
+      document.querySelectorAll('.stage-nav-btn').forEach((btn, idx) => {
         if (idx + 1 === num) {
-          btn.className = "stage-btn text-left p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 transition";
+          btn.className = "stage-nav-btn p-3.5 rounded-xl border border-emerald-500 bg-emerald-500/10 text-left transition";
         } else {
-          btn.className = "stage-btn text-left p-3 rounded-xl border border-slate-800 hover:border-emerald-500 transition";
+          btn.className = "stage-nav-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900/40 text-left hover:border-slate-700 transition";
         }
       });
 
-      const s = stages[num];
-      document.getElementById('stage-details').innerHTML = `
-        <div class="flex justify-between items-center pb-2 mb-3 border-b border-slate-800">
-          <span class="text-sm font-bold text-white">${s.title}</span>
-          <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold text-[10px]">${s.status}</span>
+      const s = pipelineData[num];
+      document.getElementById('stage-panel').innerHTML = `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-800">
+          <div>
+            <span class="text-xs font-mono text-emerald-400 uppercase tracking-wider">${s.tag}</span>
+            <h3 class="text-lg font-bold text-white mt-0.5">${s.title}</h3>
+          </div>
+          <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold font-mono self-start sm:self-auto">${s.status}</span>
         </div>
-        <div class="text-slate-400 mb-1">Tooling: <span class="text-blue-400">${s.tool}</span></div>
-        <div class="text-slate-400 mb-3">Command: <span class="text-zinc-300">${s.cmd}</span></div>
-        <pre class="bg-black/60 p-3 rounded-lg text-emerald-300 whitespace-pre-wrap">${s.output}</pre>
+        <p class="text-sm text-slate-300 mb-4 leading-relaxed">${s.summary}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+            <span class="text-slate-500 uppercase block text-[10px]">Underlying Tool</span>
+            <span class="text-slate-200 mt-1 block">${s.tool}</span>
+          </div>
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800">
+            <span class="text-slate-500 uppercase block text-[10px]">Execution Evidence</span>
+            <pre class="text-emerald-400 mt-1 whitespace-pre-wrap leading-tight">${s.result}</pre>
+          </div>
+        </div>
       `;
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition";
-      });
-      document.getElementById(`tab-${tabId}`).classList.add('active');
-      document.getElementById(`tab-btn-${tabId}`).className = "tab-btn px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white transition";
-    }
-
-    function simulateAdmission(scenario) {
-      const term = document.getElementById('admission-terminal');
+    function runAdmissionDemo(scenario) {
+      const term = document.getElementById('terminal-content');
       if (scenario === 'privileged') {
-        term.innerHTML = `<span class="text-zinc-400">$ kubectl run test-privileged --image=ghcr.io/...:latest --overrides='{"spec":{"containers":[{"name":"app","securityContext":{"privileged":true}}]}}'</span>\n\n` +
-          `<span class="text-red-400">Error from server (Forbidden): admission webhook "validate.kyverno.svc-fail" denied the request:\n\n` +
-          `policy ClusterPolicy/disallow-privileged-and-root-users fail:\n` +
-          `check-privileged-and-escalation:\n` +
-          `  validation error: Running privileged containers, allowing privilege escalation, or failing to drop ALL capabilities is strictly forbidden under enterprise security policy.\n` +
-          `  rule check-privileged-and-escalation failed at path /spec/containers/0/securityContext/privileged/\n\n` +
-          `[RESULT] 🚫 ADMISSION REJECTED: Container violates PSS Restricted standard.</span>`;
+        term.innerHTML = `<span class="text-slate-500">$ kubectl run attack-privileged --image=ghcr.io/app:v1 --overrides='{"spec":{"containers":[{"name":"pwn","securityContext":{"privileged":true}}]}}'</span>\n\n` +
+          `<span class="text-red-400 font-bold">Error from server (Forbidden): admission webhook "validate.kyverno.svc-fail" denied the request:</span>\n\n` +
+          `<span class="text-red-300">policy ClusterPolicy/disallow-privileged-and-root-users fail:\n` +
+          `  rule check-privileged-and-escalation:\n` +
+          `    validation error: Running privileged containers, allowing privilege escalation, or failing to drop ALL capabilities is strictly forbidden under enterprise security policy.\n` +
+          `    path: /spec/containers/0/securityContext/privileged/\n\n` +
+          `[INTERCEPT RESULT] 🚫 ADMISSION REJECTED: Attack vector neutralized. Pod cannot schedule on nodes.</span>`;
       } else if (scenario === 'writable_rootfs') {
-        term.innerHTML = `<span class="text-zinc-400">$ kubectl run test-writable --image=ghcr.io/...:latest --overrides='{"spec":{"containers":[{"name":"app","securityContext":{"readOnlyRootFilesystem":false}}]}}'</span>\n\n` +
-          `<span class="text-red-400">Error from server (Forbidden): admission webhook "validate.kyverno.svc-fail" denied the request:\n\n` +
-          `policy ClusterPolicy/require-ro-rootfs fail:\n` +
-          `validate-read-only-rootfs:\n` +
-          `  validation error: All containers must configure securityContext.readOnlyRootFilesystem to true.\n` +
-          `  rule validate-read-only-rootfs failed at path /spec/containers/0/securityContext/readOnlyRootFilesystem/\n\n` +
-          `[RESULT] 🚫 ADMISSION REJECTED: Writable root filesystem prohibited to prevent malware persistence.</span>`;
+        term.innerHTML = `<span class="text-slate-500">$ kubectl run attack-writable --image=ghcr.io/app:v1 --overrides='{"spec":{"containers":[{"name":"app","securityContext":{"readOnlyRootFilesystem":false}}]}}'</span>\n\n` +
+          `<span class="text-red-400 font-bold">Error from server (Forbidden): admission webhook "validate.kyverno.svc-fail" denied the request:</span>\n\n` +
+          `<span class="text-red-300">policy ClusterPolicy/require-ro-rootfs fail:\n` +
+          `  rule validate-read-only-rootfs:\n` +
+          `    validation error: All containers must configure securityContext.readOnlyRootFilesystem to true.\n` +
+          `    path: /spec/containers/0/securityContext/readOnlyRootFilesystem/\n\n` +
+          `[INTERCEPT RESULT] 🚫 ADMISSION REJECTED: Writable rootfs blocked to prevent disk tampering & backdoor downloads.</span>`;
       } else if (scenario === 'unsigned_image') {
-        term.innerHTML = `<span class="text-zinc-400">$ kubectl run test-unsigned --image=docker.io/library/alpine:latest</span>\n\n` +
-          `<span class="text-amber-400">Error from server (Forbidden): admission webhook "validate.kyverno.svc-fail" denied the request:\n\n` +
-          `policy ClusterPolicy/verify-image-signature fail:\n` +
-          `verify-cloud-ghcr-image-signature:\n` +
-          `  validation error: failed to verify image docker.io/library/alpine:latest:\n` +
-          `  no signatures found matching Sigstore Fulcio OIDC issuer: https://token.actions.githubusercontent.com\n\n` +
-          `[RESULT] 🚫 ADMISSION REJECTED: Unsigned / unverified artifact blocked by Cosign policy.</span>`;
+        term.innerHTML = `<span class="text-slate-500">$ kubectl run attack-untrusted --image=docker.io/library/untrusted-app:unsigned</span>\n\n` +
+          `<span class="text-amber-400 font-bold">Error from server (Forbidden): admission webhook "validate.kyverno.svc-fail" denied the request:</span>\n\n` +
+          `<span class="text-amber-300">policy ClusterPolicy/verify-image-signature fail:\n` +
+          `  rule verify-cloud-ghcr-image-signature:\n` +
+          `    validation error: failed to verify image docker.io/library/untrusted-app:unsigned:\n` +
+          `    no signatures found matching Sigstore Fulcio OIDC issuer: https://token.actions.githubusercontent.com\n\n` +
+          `[INTERCEPT RESULT] 🚫 ADMISSION REJECTED: Unsigned / unverified artifact blocked by Cosign policy.</span>`;
       } else if (scenario === 'compliant') {
-        term.innerHTML = `<span class="text-zinc-400">$ kubectl apply -f kubernetes/manifests/deployment.yaml</span>\n\n` +
+        term.innerHTML = `<span class="text-slate-500">$ kubectl apply -f kubernetes/manifests/deployment.yaml</span>\n\n` +
           `<span class="text-emerald-400">serviceaccount/secure-app-sa configured\n` +
-          `deployment.apps/secure-app configured\n` +
-          `service/secure-app-service configured\n\n` +
-          `[Kyverno Admission Review]\n` +
+          `deployment.apps/secure-app created\n` +
+          `service/secure-app-service created\n\n` +
+          `[Kyverno Admission Review Policy Check]\n` +
           `✔ ClusterPolicy/disallow-privileged-and-root-users: PASS (UID 65532, drop ALL capabilities)\n` +
           `✔ ClusterPolicy/require-ro-rootfs: PASS (readOnlyRootFilesystem: true)\n` +
           `✔ ClusterPolicy/verify-image-signature: PASS (Cosign signature verified against Rekor log)\n\n` +
-          `[STATUS] deployment "secure-app" successfully rolled out (2/2 Pods Running).</span>`;
+          `[STATUS] deployment "secure-app" successfully scheduled (2/2 Pods Ready & Running).</span>`;
       }
     }
 
-    function testAPI(endpoint) {
-      const respBody = document.getElementById('api-response-body');
-      const title = document.getElementById('api-request-title');
-      const badge = document.getElementById('api-status-badge');
-
-      if (endpoint === 'health') {
-        title.innerText = "HTTP/1.1 GET /healthz";
-        badge.className = "px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-mono";
-        badge.innerText = "200 OK";
-        respBody.innerHTML = `HTTP/1.1 200 OK\n` +
-          `Content-Type: application/json\n` +
-          `X-Correlation-ID: 7a82b13c-4e89-4d2b-b891-9c8e1a7b4f22\n` +
-          `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'\n` +
-          `X-Content-Type-Options: nosniff\n` +
-          `X-Frame-Options: DENY\n` +
-          `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload\n\n` +
-          `{\n  "status": "healthy",\n  "timestamp": "${new Date().toISOString()}",\n  "uptime_seconds": 1428.5\n}`;
-      } else if (endpoint === 'info') {
-        title.innerText = "HTTP/1.1 GET /api/v1/info";
-        badge.className = "px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-mono";
-        badge.innerText = "200 OK";
-        respBody.innerHTML = `HTTP/1.1 200 OK\n` +
-          `Content-Type: application/json\n` +
-          `X-Correlation-ID: 99c1e4aa-3d21-46ab-b001-f4c2e5a1b312\n\n` +
-          `{\n  "service": "enterprise-supply-chain-api",\n  "version": "1.0.0",\n  "slsa_build_level": "SLSA_BUILD_LEVEL_3",\n  "container_hardening": {\n    "base_image": "gcr.io/distroless/python3-debian12:nonroot",\n    "run_as_uid": 65532,\n    "shell_present": false,\n    "read_only_root_fs": true\n  },\n  "admission_controller": "Kyverno PSS-Restricted",\n  "git_commit": "46b280b"\n}`;
-      } else if (endpoint === 'valid_post') {
-        title.innerText = "HTTP/1.1 POST /api/v1/verify-data";
-        badge.className = "px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400 font-mono";
-        badge.innerText = "200 OK";
-        respBody.innerHTML = `Request Payload:\n` +
-          `{\n  "artifact_name": "production-payment-service",\n  "sha256_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",\n  "environment": "production"\n}\n\n` +
-          `Response Body:\n` +
-          `{\n  "verified": true,\n  "artifact_name": "production-payment-service",\n  "sha256_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",\n  "verified_at": "${new Date().toISOString()}",\n  "slsa_level": "SLSA_BUILD_LEVEL_3",\n  "correlation_id": "f512c0aa-9a11-4eb2-a901-8b2c4e1a5f67"\n}`;
-      } else if (endpoint === 'malicious_post') {
-        title.innerText = "HTTP/1.1 POST /api/v1/verify-data (Path Traversal Exploit)";
-        badge.className = "px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400 font-mono";
-        badge.innerText = "422 Unprocessable Entity";
-        respBody.innerHTML = `Request Payload (Attack Injection Attempt):\n` +
-          `{\n  "artifact_name": "../../etc/shadow",\n  "sha256_digest": "invalid_length_digest"\n}\n\n` +
-          `<span class="text-red-400">HTTP/1.1 422 Unprocessable Entity\n` +
-          `Content-Type: application/json\n\n` +
-          `{\n  "detail": [\n    {\n      "type": "value_error",\n      "loc": ["body", "artifact_name"],\n      "msg": "Value error: Dangerous token detected in artifact_name: '..'"\n    },\n    {\n      "type": "string_too_short",\n      "loc": ["body", "sha256_digest"],\n      "msg": "String should have at least 64 characters"\n    }\n  ]\n}</span>`;
-      }
-    }
-
-    // Initialize default stage
-    showStage(1);
+    // Init default stage
+    selectStage(1);
+    runAdmissionDemo('privileged');
   </script>
 </body>
 </html>
