@@ -1,0 +1,31 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-keyless-cosign-signature
+  annotations:
+    policies.kyverno.io/title: Verify Keyless Cosign Image Signature
+    policies.kyverno.io/category: Supply Chain Security & SLSA
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Validates that images deployed to the cluster originate from the certified GitHub Actions
+      workflow and carry an immutable Sigstore Rekor transparency signature log entry.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-sigstore-keyless
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/ravishkarathnayaka/*:*"
+          attestors:
+            - entries:
+                - keyless:
+                    issuer: "https://token.actions.githubusercontent.com"
+                    subject: "https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline/.github/workflows/security-pipeline.yml@refs/heads/main"
+                    rekor:
+                      url: "https://rekor.sigstore.dev"
