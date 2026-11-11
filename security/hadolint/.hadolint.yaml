@@ -1,0 +1,11 @@
+﻿# Hadolint Dockerfile Linter Security Rules
+ignored: []
+
+failure-threshold: error
+
+override:
+  error:
+    - DL3006 # Always tag image explicitly (deny untagged base images)
+    - DL3007 # Disallow using :latest tag
+    - DL3002 # Do not switch to root USER
+    - DL3018 # Pin package versions in apk/apt
