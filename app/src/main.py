@@ -1,3 +1,5 @@
+﻿from src.metrics import metrics
+from src.audit import audit_logger
 """Enterprise Supply Chain Security & SLSA Level 3 - FastAPI Application.
 
 Production-grade, hardened microservice with:
@@ -243,3 +245,9 @@ async def verify_data(payload: VerificationPayload) -> VerificationResponse:
         slsa_level=SLSA_LEVEL,
         correlation_id=correlation_id_ctx.get(),
     )
+
+@app.get("/metrics", summary="Prometheus Operational Metrics")
+async def prometheus_metrics() -> Response:
+    """Exposes Prometheus line-protocol metrics for scraping."""
+    content = metrics.export_prometheus()
+    return Response(content=content, media_type="text/plain; version=0.0.4; charset=utf-8")
