@@ -1,4 +1,4 @@
-# Enterprise Software Supply Chain Security & SLSA Level 3 Pipeline
+﻿# Enterprise Software Supply Chain Security & SLSA Level 3 Pipeline
 
 [![SLSA Level 3](https://img.shields.io/badge/SLSA-Level_3_Compliant-success?style=for-the-badge&logo=security&logoColor=white)](https://slsa.dev)
 [![Sigstore](https://img.shields.io/badge/Sigstore-Cosign_Keyless-blue?style=for-the-badge&logo=sigstore&logoColor=white)](https://sigstore.dev)
@@ -357,3 +357,33 @@ curl -i -X POST http://localhost:8000/api/v1/verify-data \
 ## License
 
 This project is licensed under the Apache 2.0 License.
+
+---
+
+## ðŸ›ï¸ Enterprise Supply Chain Architecture & SLSA Level 3 Matrix
+
+```
+ Source Commit (GPG) â”€â”€â–º Isolated Runner (SLSA L3) â”€â”€â–º Distroless Build â”€â”€â–º Syft SBOM (CycloneDX/SPDX)
+                                â”‚                                                    â”‚
+                                â–¼                                                    â–¼
+                 Semgrep SAST & Trivy SCA Gates                       Cosign Keyless Signing (Sigstore)
+                                â”‚                                                    â”‚
+                                â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                                                        â–¼
+                                       Immutable OCI Registry (ghcr.io)
+                                                        â”‚
+                                                        â–¼
+                              Kyverno Admission Controller (Validating Webhook)
+                                       â”œâ”€â”€ Verify Signature via Rekor
+                                       â”œâ”€â”€ Verify In-Toto Provenance
+                                       â””â”€â”€ Enforce Pod Security Standards (Restricted)
+                                                        â”‚
+                                                        â–¼
+                                  Kubernetes Hardened Runtime (Non-Root)
+```
+
+### Supported Standards & Frameworks
+- **SLSA v1.0 Level 3**: Complete build isolation, unforgeable in-toto provenance, and hosted ephemeral execution.
+- **NIST SP 800-218 (SSDF v1.1)**: Implementation across Prepare the Organization, Protect Software, and Respond.
+- **OWASP Top 10 for CI/CD**: Defense-in-depth mitigations against flow control bypass, dependency confusion, and credential abuse.
+- **CIS Kubernetes Benchmark v1.8**: Full compliance with restricted pod security profiles, drop-all capabilities, and read-only root filesystems.
