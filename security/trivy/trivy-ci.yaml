@@ -1,0 +1,19 @@
+﻿# Trivy CI Configuration for Automated Gates
+scan:
+  security-checks:
+    - vuln
+    - config
+    - secret
+  timeout: 10m
+
+severity:
+  - CRITICAL
+  - HIGH
+
+vulnerability:
+  ignore-unfixed: true
+
+exit-code: 1
+
+format: table
+output: ""
