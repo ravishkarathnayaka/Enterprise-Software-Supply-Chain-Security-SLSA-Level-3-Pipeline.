@@ -1,0 +1,12 @@
+﻿rules:
+  - id: insecure-pickle-deserialization
+    message: >-
+      Detected unsafe deserialization via pickle or marshal. Deserializing untrusted data can lead
+      to arbitrary remote code execution (RCE).
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: pickle.loads(...)
+      - pattern: _pickle.loads(...)
+      - pattern: marshal.loads(...)
+      - pattern: yaml.unsafe_load(...)
