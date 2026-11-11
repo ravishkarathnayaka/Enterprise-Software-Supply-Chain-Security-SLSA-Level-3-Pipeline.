@@ -1,0 +1,10 @@
+﻿apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: enterprise-supply-chain-pdb
+  namespace: secure-supply-chain
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: enterprise-supply-chain-app
