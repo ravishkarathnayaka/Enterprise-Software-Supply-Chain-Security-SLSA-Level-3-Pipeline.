@@ -1,0 +1,36 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-probes
+  annotations:
+    policies.kyverno.io/title: Require Liveness and Readiness Probes
+    policies.kyverno.io/category: Reliability & Security
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Containers in production deployments must implement liveness and readiness probes
+      to prevent traffic routing to dead or unready workloads.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-probes
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        message: "Deployments must specify livenessProbe and readinessProbe."
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - livenessProbe:
+                      httpGet:
+                        path: "?*"
+                        port: "?*"
+                    readinessProbe:
+                      httpGet:
+                        path: "?*"
+                        port: "?*"
