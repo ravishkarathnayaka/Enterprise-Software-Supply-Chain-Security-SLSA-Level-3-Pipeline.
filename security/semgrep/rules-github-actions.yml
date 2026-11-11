@@ -1,0 +1,13 @@
+﻿rules:
+  - id: unpinned-github-action
+    message: >-
+      Third-party GitHub Actions must be pinned to a full 40-character commit SHA rather than
+      mutable tags like '@main' or '@v1' to prevent supply chain poisoning.
+    severity: ERROR
+    languages: [yaml]
+    patterns:
+      - pattern-inside: |
+          uses: $ACTION
+      - metavariable-regex:
+          metavariable: $ACTION
+          regex: '^[^@]+@(master|main|v[0-9]+.*)$'
