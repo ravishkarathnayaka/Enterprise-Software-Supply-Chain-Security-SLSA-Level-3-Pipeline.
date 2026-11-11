@@ -1,0 +1,29 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-nonroot-uid
+  annotations:
+    policies.kyverno.io/title: Require Non-Root UID
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Containers must run as a non-root user with an explicit UID greater than or equal to 10000.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Containers must run as non-root user (runAsNonRoot: true)."
+        pattern:
+          spec:
+            securityContext:
+              runAsNonRoot: true
+            containers:
+              - securityContext:
+                  runAsNonRoot: true
