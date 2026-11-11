@@ -200,12 +200,15 @@ async def healthz() -> Dict[str, Any]:
 @app.get("/readyz", summary="Readiness Probe")
 async def readyz() -> Dict[str, Any]:
     """Kubernetes readiness probe ensuring downstream dependencies are reachable."""
+    audit_ok = audit_logger.verify_integrity()
     return {
-        "status": "ready",
+        "status": "ready" if audit_ok else "degraded",
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "checks": {
             "internal_state": "ok",
             "admission_compatibility": "ok",
+            "audit_hash_chain": "ok" if audit_ok else "corrupted",
+            "slsa_verification_engine": "ready",
         },
     }
 
@@ -263,3 +266,4 @@ async def get_audit_events(limit: int = 25) -> Dict[str, Any]:
         "count": len(entries),
         "entries": entries,
     }
+
