@@ -1,0 +1,13 @@
+﻿- rule: Shell Spawned in Distroless Container
+  desc: Detect any shell spawned inside our distroless runtime container
+  condition: container.name = "enterprise-supply-chain-app" and proc.name in (bash, sh, zsh, ksh)
+  output: "CRITICAL: Unexpected shell binary executed inside distroless container (user=%user.name command=%proc.cmdline)"
+  priority: CRITICAL
+  tags: [supply-chain, container-escape, mitre-execution]
+
+- rule: Modification of System Binary or Library
+  desc: Detect tampering of files within /lib or /usr inside running container
+  condition: container.name = "enterprise-supply-chain-app" and evt.type in (open, openat) and evt.dir = < and fd.name startswith "/usr/lib"
+  output: "WARNING: File modification attempted in system directory (file=%fd.name cmd=%proc.cmdline)"
+  priority: WARNING
+  tags: [integrity, tampering]
