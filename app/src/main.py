@@ -251,3 +251,15 @@ async def prometheus_metrics() -> Response:
     """Exposes Prometheus line-protocol metrics for scraping."""
     content = metrics.export_prometheus()
     return Response(content=content, media_type="text/plain; version=0.0.4; charset=utf-8")
+
+@app.get("/api/v1/audit/events", summary="Query Recent Security Audit Events")
+async def get_audit_events(limit: int = 25) -> Dict[str, Any]:
+    """Returns cryptographic audit records with verification status."""
+    entries = audit_logger.get_recent_entries(limit=min(limit, 100))
+    is_valid = audit_logger.verify_integrity()
+    return {
+        "status": "success",
+        "chain_integrity_valid": is_valid,
+        "count": len(entries),
+        "entries": entries,
+    }
