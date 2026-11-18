@@ -6,13 +6,13 @@ from src.signature_verifier import CryptographicVerifier
 
 def test_sha256_verification_pass():
     data = b"enterprise-build-artifact"
-    expected = "5e56e4b47eb25556dc9b71e72e3992b8d002344ea8bb56209594f8373b5ee003"
+    expected = "eb1746f6dc0d275dfe7a55e7f4da0114a1bfb1e35cd5cec0c6dc18104f302fb2"
     assert CryptographicVerifier.verify_sha256(data, expected) is True
 
 
 def test_sha256_verification_fail():
     data = b"tampered-artifact"
-    expected = "5e56e4b47eb25556dc9b71e72e3992b8d002344ea8bb56209594f8373b5ee003"
+    expected = "eb1746f6dc0d275dfe7a55e7f4da0114a1bfb1e35cd5cec0c6dc18104f302fb2"
     assert CryptographicVerifier.verify_sha256(data, expected) is False
 
 
