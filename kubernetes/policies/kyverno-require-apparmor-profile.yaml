@@ -1,0 +1,26 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-apparmor-profile
+  annotations:
+    policies.kyverno.io/title: Require AppArmor Profile
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Enforces AppArmor confinement on all pod containers.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: apparmor-default
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "AppArmor profile must be configured as runtime/default."
+        pattern:
+          metadata:
+            annotations:
+              =(container.apparmor.security.beta.kubernetes.io/*): "runtime/default | localhost/*"
