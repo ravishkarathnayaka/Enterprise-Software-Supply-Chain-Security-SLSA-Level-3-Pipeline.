@@ -1,0 +1,12 @@
+﻿# Gitleaks Formal Allowlist Configuration
+[allowlist]
+description = "Known mock testing digests, sha256 fixtures, and non-sensitive hashes"
+commits = []
+paths = [
+  '''app/tests/.*''',
+  '''docs/.*'''
+]
+regexes = [
+  '''e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855''',
+  '''0000000000000000000000000000000000000000000000000000000000000000'''
+]
