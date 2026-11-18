@@ -1,0 +1,30 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: auto-generate-default-deny-networkpolicy
+  annotations:
+    policies.kyverno.io/title: Auto-Generate Default-Deny NetworkPolicy
+    policies.kyverno.io/category: Multi-Tenancy & Zero Trust
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Automatically creates a default-deny NetworkPolicy whenever a new namespace is provisioned.
+spec:
+  rules:
+    - name: generate-deny-all
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+      generate:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        name: default-deny-all
+        namespace: "{{request.object.metadata.name}}"
+        synchronize: true
+        data:
+          spec:
+            podSelector: {}
+            policyTypes:
+              - Ingress
+              - Egress
