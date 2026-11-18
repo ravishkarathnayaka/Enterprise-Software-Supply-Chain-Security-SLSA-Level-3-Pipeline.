@@ -280,3 +280,18 @@ async def get_sbom_components() -> Dict[str, Any]:
             {"name": "uvicorn", "version": "0.28.0", "purl": "pkg:pypi/uvicorn@0.28.0"},
         ],
     }
+
+@app.get("/api/v1/vex/status", summary="Query Vulnerability Exploitability Status")
+async def get_vex_status(cve_id: str = "CVE-2026-1188") -> Dict[str, Any]:
+    """Evaluates VEX exploitability statement for a target CVE."""
+    from src.vex import vex_evaluator, VexStatement, VexStatus
+    # Register default baseline exemption
+    vex_evaluator.register_statement(
+        VexStatement(
+            vulnerability_id="CVE-2026-1188",
+            status=VexStatus.NOT_AFFECTED,
+            justification="code_not_reachable",
+            remediation_notes="Vulnerable code path eliminated in distroless build.",
+        )
+    )
+    return vex_evaluator.evaluate_cve(cve_id)
