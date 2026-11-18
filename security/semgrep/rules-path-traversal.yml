@@ -1,0 +1,10 @@
+﻿rules:
+  - id: archive-path-traversal-slip
+    message: >-
+      Insecure archive extraction detected without sanitizing filenames against directory traversal ('..').
+      Adversaries can overwrite critical system binaries via Zip Slip.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: $TAR.extractall(...)
+      - pattern: $ZIP.extractall(...)
