@@ -4,16 +4,16 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from src.security_middleware import ThreatInspectionMiddleware
 
-test_app = FastAPI()
-test_app.add_middleware(ThreatInspectionMiddleware)
+custom_app = FastAPI()
+custom_app.add_middleware(ThreatInspectionMiddleware)
 
 
-@test_app.get("/ping")
+@custom_app.get("/ping")
 def ping():
     return {"status": "pong"}
 
 
-client = TestClient(test_app)
+client = TestClient(custom_app)
 
 
 def test_threat_middleware_blocks_suspicious_header():
