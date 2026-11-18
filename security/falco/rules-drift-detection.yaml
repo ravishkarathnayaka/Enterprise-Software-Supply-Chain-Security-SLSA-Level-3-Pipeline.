@@ -1,0 +1,6 @@
+﻿- rule: Execution of Binary Outside Root Image Layers
+  desc: Detect any execution of binaries written to ephemeral /tmp or memory mounts
+  condition: container.name = "enterprise-supply-chain-app" and proc.pname exists and proc.exepath startswith "/tmp"
+  output: "CRITICAL: Untrusted binary execution attempted from /tmp (cmdline=%proc.cmdline user=%user.name)"
+  priority: CRITICAL
+  tags: [drift, runtime-integrity, mitre-defense-evasion]
