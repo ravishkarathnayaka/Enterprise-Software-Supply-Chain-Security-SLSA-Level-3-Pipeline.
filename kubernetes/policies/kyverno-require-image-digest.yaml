@@ -1,0 +1,27 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-image-digest
+  annotations:
+    policies.kyverno.io/title: Require Immutable Image Digest
+    policies.kyverno.io/category: Supply Chain Security & Immutability
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Prohibits mutable container image tags (e.g., :latest, :v1). Every image reference
+      must specify an immutable SHA256 digest (@sha256:...) to guarantee provenance integrity.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-image-digest
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Container images must be referenced using immutable SHA-256 digests (*@sha256:*)."
+        pattern:
+          spec:
+            containers:
+              - image: "*@sha256:*"
