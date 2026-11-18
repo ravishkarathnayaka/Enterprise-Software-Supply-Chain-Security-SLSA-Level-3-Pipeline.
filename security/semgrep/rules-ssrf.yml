@@ -1,0 +1,16 @@
+﻿rules:
+  - id: python-potential-ssrf
+    message: >-
+      Unvalidated user input passed directly into HTTP request functions (requests, httpx, urllib).
+      This can lead to Server-Side Request Forgery (SSRF) and metadata service exfiltration.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: requests.get($URL, ...)
+      - pattern: requests.post($URL, ...)
+      - pattern: httpx.get($URL, ...)
+      - pattern: httpx.post($URL, ...)
+    patterns:
+      - pattern-inside: |
+          async def $FUNC(..., $PAYLOAD, ...):
+            ...
