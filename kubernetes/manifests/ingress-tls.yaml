@@ -1,0 +1,27 @@
+﻿apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: enterprise-supply-chain-ingress
+  namespace: secure-supply-chain
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/limit-rps: "25"
+spec:
+  tls:
+    - hosts:
+        - api.supplychain.internal
+      secretName: supplychain-tls-cert
+  rules:
+    - host: api.supplychain.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: enterprise-supply-chain-svc
+                port:
+                  number: 8080
