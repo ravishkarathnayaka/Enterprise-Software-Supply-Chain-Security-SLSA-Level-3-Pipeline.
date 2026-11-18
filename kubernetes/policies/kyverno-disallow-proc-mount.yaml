@@ -1,0 +1,27 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-unmasked-proc-mount
+  annotations:
+    policies.kyverno.io/title: Disallow Unmasked /proc Mount
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Restricts procMount to Default to prevent exposure of sensitive host /proc paths.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: proc-mount-default
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "procMount must be set to Default."
+        pattern:
+          spec:
+            containers:
+              - =(securityContext):
+                  =(procMount): "Default"
