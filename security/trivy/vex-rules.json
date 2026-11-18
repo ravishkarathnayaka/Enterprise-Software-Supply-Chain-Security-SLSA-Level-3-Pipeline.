@@ -1,0 +1,17 @@
+﻿{
+  "$schema": "https://cyclonedx.org/schema/vex-1.0.json",
+  "document": {
+    "category": "vex",
+    "version": 1,
+    "vulnerabilities": [
+      {
+        "id": "CVE-2026-1188",
+        "analysis": {
+          "state": "not_affected",
+          "justification": "code_not_reachable",
+          "detail": "Vulnerable subsystem stripped from distroless runtime container."
+        }
+      }
+    ]
+  }
+}
