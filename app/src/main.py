@@ -267,3 +267,16 @@ async def get_audit_events(limit: int = 25) -> Dict[str, Any]:
         "entries": entries,
     }
 
+
+@app.get("/api/v1/sbom/components", summary="List Installed Catalog Components")
+async def get_sbom_components() -> Dict[str, Any]:
+    """Returns baseline microservice components cataloged in CycloneDX SBOM."""
+    return {
+        "format": "CycloneDX-1.5",
+        "total_packages": 3,
+        "packages": [
+            {"name": "fastapi", "version": "0.110.0", "purl": "pkg:pypi/fastapi@0.110.0"},
+            {"name": "pydantic", "version": "2.6.4", "purl": "pkg:pypi/pydantic@2.6.4"},
+            {"name": "uvicorn", "version": "0.28.0", "purl": "pkg:pypi/uvicorn@0.28.0"},
+        ],
+    }
