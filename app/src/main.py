@@ -295,3 +295,11 @@ async def get_vex_status(cve_id: str = "CVE-2026-1188") -> Dict[str, Any]:
         )
     )
     return vex_evaluator.evaluate_cve(cve_id)
+
+@app.get("/healthz/deep", summary="Deep Diagnostic Subsystem Health Probe")
+async def deep_health_probe() -> Dict[str, Any]:
+    """Evaluates diagnostic subsystem status across audit logs and dependencies."""
+    from src.health import HealthSubsystemProber
+    prober = HealthSubsystemProber(start_time=START_TIME)
+    is_audit_healthy = audit_logger.verify_integrity()
+    return prober.check_subsystems(audit_healthy=is_audit_healthy)
