@@ -1,0 +1,10 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runtime-security-config
+  namespace: secure-supply-chain
+data:
+  ALLOWED_OCI_REGISTRIES: "ghcr.io/ravishkarathnayaka"
+  SLSA_LEVEL_MANDATE: "SLSA_BUILD_LEVEL_3"
+  ENFORCE_REKOR_TRANSPARENCY: "true"
+  ADMISSION_WEBHOOK_TIMEOUT: "30s"
