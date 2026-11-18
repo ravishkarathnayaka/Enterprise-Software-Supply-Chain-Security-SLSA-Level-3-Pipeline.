@@ -1,0 +1,6 @@
+﻿# Open Source Vulnerabilities (OSV) Scanner Configuration
+[PackageExceptions]
+# Exclude dev-only dependencies from blocking gates
+[[PackageExceptions]]
+name = "pytest"
+reason = "Dev dependency executed in isolated CI ephemeral runner only."
