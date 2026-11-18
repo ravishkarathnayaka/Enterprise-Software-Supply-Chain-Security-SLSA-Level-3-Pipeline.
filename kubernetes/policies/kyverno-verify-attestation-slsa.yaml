@@ -1,0 +1,30 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-slsa-attestation-predicate
+  annotations:
+    policies.kyverno.io/title: Verify SLSA Provenance Predicate
+    policies.kyverno.io/category: SLSA Level 3
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Validates in-toto SLSA provenance predicate structure attached to the container image.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-in-toto-slsa
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/ravishkarathnayaka/*:*"
+          attestations:
+            - predicateType: "https://slsa.dev/provenance/v0.2"
+              attestors:
+                - entries:
+                    - keyless:
+                        issuer: "https://token.actions.githubusercontent.com"
+                        subject: "https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline/.github/workflows/security-pipeline.yml@refs/heads/main"
