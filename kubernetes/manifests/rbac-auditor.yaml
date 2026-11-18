@@ -1,0 +1,24 @@
+﻿apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: supply-chain-auditor
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "namespaces", "nodes"]
+    verbs: ["get", "list"]
+  - apiGroups: ["kyverno.io"]
+    resources: ["clusterpolicies", "policies", "policyreports"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: supply-chain-auditor-binding
+subjects:
+  - kind: ServiceAccount
+    name: enterprise-supply-chain-sa
+    namespace: secure-supply-chain
+roleRef:
+  kind: ClusterRole
+  name: supply-chain-auditor
+  apiGroup: rbac.authorization.k8s.io
