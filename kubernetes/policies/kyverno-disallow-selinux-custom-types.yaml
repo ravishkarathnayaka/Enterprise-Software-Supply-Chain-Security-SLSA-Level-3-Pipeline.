@@ -1,0 +1,27 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-selinux-custom-types
+  annotations:
+    policies.kyverno.io/title: Disallow Custom SELinux Types
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Restricts setting custom SELinux options in Pod security contexts to prevent container breakout.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: selinux-types
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Custom SELinux types are forbidden."
+        pattern:
+          spec:
+            =(securityContext):
+              =(seLinuxOptions):
+                =(type): ""
