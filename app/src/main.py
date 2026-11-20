@@ -329,3 +329,9 @@ async def get_sbom_diff() -> Dict[str, Any]:
     base = [{"name": "fastapi", "version": "0.110.0"}, {"name": "pydantic", "version": "2.6.4"}]
     cand = [{"name": "fastapi", "version": "0.110.0"}, {"name": "pydantic", "version": "2.6.4"}, {"name": "uvicorn", "version": "0.28.0"}]
     return sbom_differ.compare_components(base, cand)
+
+@app.post("/api/v1/admission/simulate", summary="Simulate Kubernetes Admission Decision")
+async def post_admission_simulate(spec: Dict[str, Any]) -> Dict[str, Any]:
+    """Evaluates arbitrary Pod manifest securityContext against Kyverno PSS-Restricted policies."""
+    from src.admission_simulator import admission_simulator
+    return admission_simulator.evaluate_pod_spec(spec)
