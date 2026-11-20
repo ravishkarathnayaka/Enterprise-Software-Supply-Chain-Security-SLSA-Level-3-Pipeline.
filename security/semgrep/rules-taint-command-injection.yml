@@ -1,0 +1,16 @@
+﻿rules:
+  - id: python-tainted-command-injection
+    message: >-
+      User-controlled input flows directly into command execution functions without sanitization.
+      This allows arbitrary shell command injection.
+    severity: ERROR
+    languages: [python]
+    mode: taint
+    pattern-sources:
+      - pattern: request.json(...)
+      - pattern: payload.$FIELD
+    pattern-sinks:
+      - pattern: subprocess.run(...)
+      - pattern: subprocess.Popen(...)
+      - pattern: os.system(...)
+      - pattern: os.popen(...)
