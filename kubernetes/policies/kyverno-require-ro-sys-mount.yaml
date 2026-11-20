@@ -1,0 +1,27 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-ro-sys-mount
+  annotations:
+    policies.kyverno.io/title: Require Read-Only /sys Mounts
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Containers must not mount /sys or /proc/sys in writeable mode to prevent host kernel tampering.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-ro-sys
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Mounting /sys or /proc in writeable mode is strictly forbidden."
+        pattern:
+          spec:
+            =(volumes):
+              - =(hostPath):
+                  =(path): "!/sys* & !/proc/sys*"
