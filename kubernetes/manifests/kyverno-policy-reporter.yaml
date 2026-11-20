@@ -1,0 +1,24 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyverno-policy-reporter
+  namespace: kyverno
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: policy-reporter
+  template:
+    metadata:
+      labels:
+        app: policy-reporter
+    spec:
+      containers:
+        - name: policy-reporter
+          image: ghcr.io/kyverno/policy-reporter:v2.17.0
+          ports:
+            - containerPort: 8080
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
