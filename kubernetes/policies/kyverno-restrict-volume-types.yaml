@@ -1,0 +1,26 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-volume-types
+  annotations:
+    policies.kyverno.io/title: Restrict Volume Types
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Restricts pod volume mounts strictly to configMap, secret, and emptyDir. HostPath is denied.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: allowed-volumes
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Only configMap, secret, and emptyDir volume types are permitted."
+        pattern:
+          spec:
+            =(volumes):
+              - =(hostPath): null
