@@ -1,0 +1,26 @@
+﻿{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "title": "Enterprise Supply Chain Security & SLSA L3 Telemetry",
+  "panels": [
+    {
+      "title": "Total Verified Artifacts",
+      "type": "stat",
+      "targets": [{"expr": "supply_chain_verifications_total"}]
+    },
+    {
+      "title": "Blocked Security Violations",
+      "type": "stat",
+      "targets": [{"expr": "supply_chain_security_violations_total"}]
+    },
+    {
+      "title": "Request Rate by Endpoint",
+      "type": "timeseries",
+      "targets": [{"expr": "rate(supply_chain_requests_total[5m])"}]
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}
