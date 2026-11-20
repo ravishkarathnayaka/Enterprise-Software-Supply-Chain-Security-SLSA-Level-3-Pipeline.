@@ -1,0 +1,30 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-cyclonedx-sbom-attestation
+  annotations:
+    policies.kyverno.io/title: Verify CycloneDX SBOM Attestation
+    policies.kyverno.io/category: Supply Chain & Transparency
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Enforces presence of a cryptographically signed CycloneDX SBOM attestation on container images.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-cyclonedx-attestation
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/ravishkarathnayaka/*:*"
+          attestations:
+            - predicateType: "https://cyclonedx.org/schema"
+              attestors:
+                - entries:
+                    - keyless:
+                        issuer: "https://token.actions.githubusercontent.com"
+                        subject: "https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline/.github/workflows/security-pipeline.yml@refs/heads/main"
