@@ -1,0 +1,6 @@
+﻿- rule: Supply Chain Code Tampering Detected
+  desc: Detect unexpected modification of Python source files inside container
+  condition: container.name = "enterprise-supply-chain-app" and evt.type in (open, openat) and evt.dir = < and (fd.name endswith ".py" or fd.name endswith ".pyc") and evt.rawres >= 0 and not proc.name in (python, python3)
+  output: "CRITICAL: Non-Python process modified application source code (user=%user.name proc=%proc.name file=%fd.name)"
+  priority: CRITICAL
+  tags: [tampering, integrity, supply-chain]
