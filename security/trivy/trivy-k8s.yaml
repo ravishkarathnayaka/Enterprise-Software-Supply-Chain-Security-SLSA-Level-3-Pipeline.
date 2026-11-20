@@ -1,0 +1,12 @@
+﻿# Trivy Kubernetes Cluster Audit Configuration
+cluster:
+  tolerances:
+    - critical: 0
+    - high: 0
+compliance:
+  spec: "@kubernetes-cis-1.8"
+scanners:
+  - misconfig
+  - rbac
+report: summary
+exit-code: 0
