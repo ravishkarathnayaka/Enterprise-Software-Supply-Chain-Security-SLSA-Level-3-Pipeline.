@@ -1,0 +1,6 @@
+﻿# Gitleaks Rules for Sigstore Artifacts & Tokens
+[[rules]]
+id = "sigstore-fulcio-cert"
+description = "Detected embedded Sigstore Fulcio ephemeral root or signing certificate"
+regex = '''-----BEGIN CERTIFICATE-----[A-Za-z0-9+/=\s]+-----END CERTIFICATE-----'''
+keywords = ["BEGIN CERTIFICATE"]
