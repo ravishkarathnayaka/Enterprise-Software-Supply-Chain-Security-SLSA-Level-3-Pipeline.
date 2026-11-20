@@ -1,0 +1,14 @@
+﻿{
+  "default": [
+    {
+      "type": "in-toto",
+      "predicates": [
+        "https://slsa.dev/provenance/v0.2",
+        "https://cyclonedx.org/schema"
+      ],
+      "keys": [
+        "https://token.actions.githubusercontent.com"
+      ]
+    }
+  ]
+}
