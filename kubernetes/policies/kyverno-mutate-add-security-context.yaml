@@ -1,0 +1,25 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mutate-hardened-security-context
+  annotations:
+    policies.kyverno.io/title: Auto-Inject Hardened SecurityContext
+    policies.kyverno.io/category: Mutating Admission
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Automatically mutates pods to inject allowPrivilegeEscalation=false if omitted.
+spec:
+  rules:
+    - name: inject-privilege-escalation-false
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      mutate:
+        patchStrategicMerge:
+          spec:
+            containers:
+              - (name): "?*"
+                securityContext:
+                  allowPrivilegeEscalation: false
