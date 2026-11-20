@@ -13,7 +13,13 @@ class ComplianceScorer:
     def calculate_score(active_controls: Dict[str, bool]) -> Dict[str, Any]:
         total = len(active_controls)
         if total == 0:
-            return {"score": 0.0, "rating": "F"}
+            return {
+                "compliance_score": 0.0,
+                "grade": "F",
+                "passed_controls": 0,
+                "total_controls": 0,
+                "slsa_level_3_ready": False,
+            }
 
         passed = sum(1 for status in active_controls.values() if status)
         percentage = round((passed / total) * 100.0, 1)
