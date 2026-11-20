@@ -1,0 +1,27 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-ports
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Ports (< 1024)
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Containers must not bind directly to ports below 1024 without root privileges.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-container-ports
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Container ports below 1024 are disallowed. Use non-privileged ports (e.g., 8080)."
+        pattern:
+          spec:
+            containers:
+              - =(ports):
+                  - containerPort: ">1023"
