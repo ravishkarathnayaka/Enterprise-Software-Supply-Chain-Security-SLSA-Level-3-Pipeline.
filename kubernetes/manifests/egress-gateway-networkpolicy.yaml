@@ -1,0 +1,18 @@
+﻿apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-strict-telemetry
+  namespace: secure-supply-chain
+spec:
+  podSelector:
+    matchLabels:
+      app: enterprise-supply-chain-app
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.0/8
+      ports:
+        - protocol: TCP
+          port: 443
