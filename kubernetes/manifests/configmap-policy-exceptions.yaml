@@ -1,0 +1,11 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admission-policy-exceptions
+  namespace: secure-supply-chain
+data:
+  EXCEPTIONS_REGISTER: |
+    - cve_id: CVE-2026-1188
+      status: WAIVED
+      expires: "2026-12-20T00:00:00Z"
+      approved_by: "secops-lead"
