@@ -1,0 +1,27 @@
+﻿apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-supply-chain-labels
+  annotations:
+    policies.kyverno.io/title: Require SLSA Metadata Labels
+    policies.kyverno.io/category: Governance & Tracking
+    policies.kyverno.io/severity: low
+    policies.kyverno.io/description: >-
+      Pods must declare 'slsa.dev/level' and 'security.enterprise.io/owner' metadata labels.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        message: "Deployment must specify 'slsa.dev/level' and 'security.enterprise.io/owner' labels."
+        pattern:
+          metadata:
+            labels:
+              slsa.dev/level: "?*"
+              security.enterprise.io/owner: "?*"
