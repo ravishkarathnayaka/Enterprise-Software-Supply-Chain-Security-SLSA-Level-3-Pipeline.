@@ -1,0 +1,12 @@
+﻿rules:
+  - id: deprecated-hash-algorithm-usage
+    message: >-
+      Deprecated cryptographic hashing algorithm detected (MD5 or SHA-1).
+      Enterprise policy mandates SHA-256 or SHA-512 for supply chain integrity.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: hashlib.md5(...)
+      - pattern: hashlib.sha1(...)
+      - pattern: Crypto.Hash.MD5.new(...)
+      - pattern: Crypto.Hash.SHA.new(...)
