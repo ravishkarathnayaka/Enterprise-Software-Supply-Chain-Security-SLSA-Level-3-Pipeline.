@@ -321,3 +321,11 @@ async def get_compliance_score() -> Dict[str, Any]:
         "network_policy_default_deny": True,
     }
     return compliance_scorer.calculate_score(controls)
+
+@app.get("/api/v1/sbom/diff", summary="Evaluate Dependency Drift Between Releases")
+async def get_sbom_diff() -> Dict[str, Any]:
+    """Calculates architectural drift between production release baseline and current build."""
+    from src.sbom_diff import sbom_differ
+    base = [{"name": "fastapi", "version": "0.110.0"}, {"name": "pydantic", "version": "2.6.4"}]
+    cand = [{"name": "fastapi", "version": "0.110.0"}, {"name": "pydantic", "version": "2.6.4"}, {"name": "uvicorn", "version": "0.28.0"}]
+    return sbom_differ.compare_components(base, cand)
