@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-nonroot-groups
+  annotations:
+    policies.kyverno.io/title: Require Non-Root GID in Pod Security Context
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Ensure fsGroup and supplementalGroups do not utilize root GID (0).
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-fsgroup-nonroot
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "fsGroup must be non-zero (> 0)."
+        pattern:
+          spec:
+            =(securityContext):
+              =(fsGroup): ">0"
