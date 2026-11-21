@@ -1,0 +1,10 @@
+apiVersion: cosign.sigstore.dev/v1alpha1
+kind: KeylessVerificationPolicy
+metadata:
+  name: keyless-oidc-policy
+spec:
+  issuer: "https://token.actions.githubusercontent.com"
+  subject: "https://github.com/ravishkarathnayaka/Enterprise-Software-Supply-Chain-Security-SLSA-Level-3-Pipeline..git"
+  rekor:
+    url: "https://rekor.sigstore.dev"
+    requireInclusion: true
