@@ -1,0 +1,32 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-vuln-attestation
+  annotations:
+    policies.kyverno.io/title: Verify Vulnerability Scan Attestation
+    policies.kyverno.io/category: Supply Chain & SLSA Security
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Verifies Cosign vulnerability attestation for container images before cluster admission.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: verify-vuln-scan
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - enterprise-sec-pipeline
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/ravishkarathnayaka/enterprise-secure-app:*"
+          attestations:
+            - predicateType: https://cosign.sigstore.dev/attestation/vuln/v1
+              conditions:
+                - all:
+                    - key: "{{ scanner.result.summary.criticalCount }}"
+                      operator: Equals
+                      value: 0
