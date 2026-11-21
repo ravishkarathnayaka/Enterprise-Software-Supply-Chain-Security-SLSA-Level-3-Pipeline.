@@ -1,0 +1,11 @@
+rules:
+  - id: dynamic-eval-injection
+    patterns:
+      - pattern: eval(...)
+    message: "Direct execution of dynamic eval() exposes the microservice to arbitrary remote code execution."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code"
+      category: security
+      technology: [python]
