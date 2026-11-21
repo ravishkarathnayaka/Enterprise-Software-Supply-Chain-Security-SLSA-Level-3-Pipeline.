@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatekeeper-controller-manager
+  namespace: gatekeeper-system
+  labels:
+    control-plane: controller-manager
+    gatekeeper.sh/operation: webhook
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+      gatekeeper.sh/operation: webhook
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+        gatekeeper.sh/operation: webhook
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: manager
+          image: openpolicyagent/gatekeeper:v3.15.0@sha256:7bc1dcf3486c8d76cb0697ad10c9780b91d293297a73fcffb0c5bb71cfa06830
+          args:
+            - --port=8443
+            - --logtostderr
+            - --exempt-namespace=gatekeeper-system
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
