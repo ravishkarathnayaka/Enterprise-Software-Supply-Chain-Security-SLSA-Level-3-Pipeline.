@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-host-ports
+  annotations:
+    policies.kyverno.io/title: Disallow Host Ports
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Disallow hostPort to prevent port conflicts and bypassing network security controls.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-no-hostport
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "hostPort is strictly prohibited."
+        pattern:
+          spec:
+            containers:
+              - =(ports):
+                  - X(hostPort): null
