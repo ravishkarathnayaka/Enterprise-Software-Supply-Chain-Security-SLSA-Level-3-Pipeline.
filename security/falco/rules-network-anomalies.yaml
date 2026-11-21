@@ -1,0 +1,10 @@
+# Falco Runtime Network Anomaly Detection
+- rule: Unauthorized Outbound Egress Connection
+  desc: Detect unexpected outbound network connections from app containers
+  condition: >
+    outbound and container and container.name = "enterprise-secure-app"
+    and not fd.sip in (internal_ip_net)
+  output: >
+    Anomalous outbound egress detected (user=%user.name command=%proc.cmdline connection=%fd.name)
+  priority: WARNING
+  tags: [network, supply_chain, egress]
