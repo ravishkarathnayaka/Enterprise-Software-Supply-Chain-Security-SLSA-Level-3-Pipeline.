@@ -1,0 +1,8 @@
+# Trivy Filesystem Scan Ignore Configuration
+ignore-unfixed: false
+ignore-licenses: []
+ignore-paths:
+  - "app/tests/**"
+  - "**/.pytest_cache/**"
+  - "**/__pycache__/**"
+  - "docs/**"
