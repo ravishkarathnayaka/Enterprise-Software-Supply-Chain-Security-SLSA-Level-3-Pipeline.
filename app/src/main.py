@@ -353,3 +353,9 @@ async def get_sbom_licenses() -> Dict[str, Any]:
         {"name": "cryptography", "license": "Apache-2.0"},
     ]
     return license_scanner.evaluate_licenses(packages)
+
+@app.get("/api/v1/crypto/benchmark", summary="Cryptographic Throughput & Latency Benchmark")
+async def get_crypto_benchmark(iterations: int = 500) -> Dict[str, Any]:
+    """Executes on-demand cryptographic hashing performance micro-benchmark."""
+    from src.security_benchmarks import benchmark_runner
+    return benchmark_runner.run_benchmark(iterations=min(iterations, 2000))
