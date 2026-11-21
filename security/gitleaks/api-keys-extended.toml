@@ -1,0 +1,14 @@
+# Extended Gitleaks Token & Credential Signatures
+[[rules]]
+id = "proprietary-cloud-api-key"
+description = "Proprietary Enterprise Cloud API Access Key"
+regex = '''(?i)(?:enterprise_api|ent_sec_key)[\s]*[=:][\s]*['"][a-zA-Z0-9_\-]{32,64}['"]'''
+secretGroup = 0
+keywords = ["enterprise_api", "ent_sec_key"]
+
+[[rules]]
+id = "custom-sigstore-oidc-bearer"
+description = "Sigstore OIDC Raw Bearer Token"
+regex = '''(?i)(?:sigstore_token|oidc_bearer)[\s]*[=:][\s]*['"][a-zA-Z0-9\._\-]{64,128}['"]'''
+secretGroup = 0
+keywords = ["sigstore_token", "oidc_bearer"]
