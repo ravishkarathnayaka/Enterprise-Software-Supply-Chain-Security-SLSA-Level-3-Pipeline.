@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-ephemeral-storage-limit
+  annotations:
+    policies.kyverno.io/title: Require Ephemeral Storage Limit
+    policies.kyverno.io/category: Resource Management & Pod Security
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Containers must declare ephemeral-storage limits to prevent node disk exhaustion attacks.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-ephemeral-storage
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "All containers must define limits.ephemeral-storage."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    ephemeral-storage: "?*"
