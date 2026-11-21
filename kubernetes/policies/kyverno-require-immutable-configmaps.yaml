@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-immutable-configmaps
+  annotations:
+    policies.kyverno.io/title: Enforce Immutable ConfigMaps
+    policies.kyverno.io/category: Supply Chain Integrity & Tamper Proofing
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Ensures ConfigMaps in production namespaces are marked immutable to prevent runtime tampering.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: check-configmap-immutable
+      match:
+        any:
+          - resources:
+              kinds:
+                - ConfigMap
+              namespaces:
+                - enterprise-sec-pipeline
+      validate:
+        message: "ConfigMaps deployed in production must declare immutable: true."
+        pattern:
+          immutable: true
