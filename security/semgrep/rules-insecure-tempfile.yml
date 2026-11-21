@@ -1,0 +1,11 @@
+rules:
+  - id: insecure-temporary-file
+    patterns:
+      - pattern: tempfile.mktemp(...)
+    message: "tempfile.mktemp() is deprecated and vulnerable to symlink and race condition attacks. Use tempfile.NamedTemporaryFile() instead."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-377: Insecure Temporary File"
+      category: security
+      technology: [python]
