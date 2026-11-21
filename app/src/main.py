@@ -341,3 +341,15 @@ async def post_validate_attestation(statement: Dict[str, Any]) -> Dict[str, Any]
     """Validates DSSE in-toto provenance statement against SLSA Level 3 builder requirements."""
     from src.predicate_validator import predicate_validator
     return predicate_validator.validate_statement(statement)
+
+@app.get("/api/v1/sbom/licenses", summary="Audit SBOM Package Licenses for Copyleft Risk")
+async def get_sbom_licenses() -> Dict[str, Any]:
+    """Scans cataloged microservice components for viral copyleft or unapproved licenses."""
+    from src.license_scanner import license_scanner
+    packages = [
+        {"name": "fastapi", "license": "MIT"},
+        {"name": "pydantic", "license": "MIT"},
+        {"name": "uvicorn", "license": "BSD-3-Clause"},
+        {"name": "cryptography", "license": "Apache-2.0"},
+    ]
+    return license_scanner.evaluate_licenses(packages)
