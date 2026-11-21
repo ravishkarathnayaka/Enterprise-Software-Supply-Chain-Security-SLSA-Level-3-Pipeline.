@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-capabilities-add
+  annotations:
+    policies.kyverno.io/title: Disallow Capabilities Add
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Containers must not add any Linux capabilities beyond the allowed baseline.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: validate-no-capabilities-added
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Adding Linux capabilities is strictly forbidden in restricted namespaces."
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  capabilities:
+                    X(add): null
