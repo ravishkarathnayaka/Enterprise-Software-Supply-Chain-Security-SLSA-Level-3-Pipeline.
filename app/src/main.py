@@ -335,3 +335,9 @@ async def post_admission_simulate(spec: Dict[str, Any]) -> Dict[str, Any]:
     """Evaluates arbitrary Pod manifest securityContext against Kyverno PSS-Restricted policies."""
     from src.admission_simulator import admission_simulator
     return admission_simulator.evaluate_pod_spec(spec)
+
+@app.post("/api/v1/attestation/validate", summary="Validate In-Toto Provenance Statement")
+async def post_validate_attestation(statement: Dict[str, Any]) -> Dict[str, Any]:
+    """Validates DSSE in-toto provenance statement against SLSA Level 3 builder requirements."""
+    from src.predicate_validator import predicate_validator
+    return predicate_validator.validate_statement(statement)
