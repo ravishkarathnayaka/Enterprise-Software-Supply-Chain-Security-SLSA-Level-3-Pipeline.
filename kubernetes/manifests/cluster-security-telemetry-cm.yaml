@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-security-telemetry
+  namespace: enterprise-sec-pipeline
+  labels:
+    app.kubernetes.io/part-of: enterprise-supply-chain
+data:
+  telemetry.json: |
+    {
+      "slsa_verification_enabled": true,
+      "rekor_transparency_sync": true,
+      "admission_failure_action": "ENFORCE",
+      "metric_emission_rate_sec": 15,
+      "alert_webhook_endpoint": "https://siem.internal.enterprise/events",
+      "signature_enforcement": "COSIGN_STRICT"
+    }
