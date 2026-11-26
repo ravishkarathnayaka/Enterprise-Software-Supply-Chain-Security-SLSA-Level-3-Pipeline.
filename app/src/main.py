@@ -376,3 +376,11 @@ async def post_evaluate_vuln(body: Dict[str, Any]) -> Dict[str, Any]:
     cvss = float(body.get("cvss", 0.0))
     epss = float(body.get("epss", 0.0))
     return vulnerability_evaluator.evaluate_vulnerability(cve, cvss, epss)
+
+@app.post("/api/v1/drift/verify", summary="Verify Workload Container Image Digest Drift")
+async def post_verify_drift(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Compares runtime container image digest against approved deployment baseline."""
+    from src.drift_detector import drift_detector
+    base = body.get("baseline_digest", "")
+    running = body.get("running_digest", "")
+    return drift_detector.detect_drift(base, running)
