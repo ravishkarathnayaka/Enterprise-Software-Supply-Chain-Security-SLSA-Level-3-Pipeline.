@@ -1,0 +1,14 @@
+# Extended Gitleaks OAuth and Cloud Identity Regex Signatures
+[[rules]]
+id = "github-app-installation-token"
+description = "GitHub App Server-to-Server Token"
+regex = '''(?i)(?:ghs_[0-9a-zA-Z]{36}|ghu_[0-9a-zA-Z]{36})'''
+secretGroup = 0
+keywords = ["ghs_", "ghu_"]
+
+[[rules]]
+id = "cloud-iam-refresh-token"
+description = "Cloud Provider OAuth 2.0 Refresh Token"
+regex = '''(?i)(?:oauth_refresh_token|refresh_token)[\s]*[=:][\s]*['"][a-zA-Z0-9_\-\.]{40,80}['"]'''
+secretGroup = 0
+keywords = ["oauth_refresh_token", "refresh_token"]
