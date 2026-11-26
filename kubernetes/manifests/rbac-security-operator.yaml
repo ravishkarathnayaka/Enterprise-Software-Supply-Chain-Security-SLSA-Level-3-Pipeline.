@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: supplychain-operator-role
+  namespace: enterprise-sec-pipeline
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: supplychain-operator-binding
+  namespace: enterprise-sec-pipeline
+subjects:
+  - kind: ServiceAccount
+    name: enterprise-app-sa
+    namespace: enterprise-sec-pipeline
+roleRef:
+  kind: Role
+  name: supplychain-operator-role
+  apiGroup: rbac.authorization.k8s.io
