@@ -1,0 +1,13 @@
+rules:
+  - id: insecure-ecb-cipher-mode
+    patterns:
+      - pattern-either:
+          - pattern: cryptography.hazmat.primitives.ciphers.modes.ECB(...)
+          - pattern: modes.ECB(...)
+    message: "Electronic Codebook (ECB) mode does not provide semantic security. Use AES-GCM or ChaCha20-Poly1305."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      category: security
+      technology: [python]
