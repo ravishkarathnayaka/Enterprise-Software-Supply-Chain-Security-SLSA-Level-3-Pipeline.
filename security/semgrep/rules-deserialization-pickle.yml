@@ -1,0 +1,13 @@
+rules:
+  - id: insecure-pickle-deserialization
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: _pickle.loads(...)
+    message: "Deserializing untrusted pickle streams allows arbitrary code execution. Use JSON or Protocol Buffers."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      category: security
+      technology: [python]
