@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: supply-chain-security-alerts
+  namespace: monitoring
+  labels:
+    role: alert-rules
+spec:
+  groups:
+    - name: supply-chain.rules
+      rules:
+        - alert: KyvernoAdmissionRejectionSpike
+          expr: increase(kyverno_admission_requests_total{status="blocked"}[5m]) > 5
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Elevated rate of blocked admission requests detected by Kyverno"
+        - alert: WorkloadDigestDriftDetected
+          expr: workload_image_digest_drift_total > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Running container image digest differs from approved release digest"
