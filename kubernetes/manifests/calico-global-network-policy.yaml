@@ -1,0 +1,14 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: quarantine-isolated-workloads
+spec:
+  selector: quarantine == 'true'
+  order: 10
+  types:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - action: Log
+    - action: Deny
