@@ -1,28 +1,41 @@
-﻿"""Lightweight Policy-as-Code Evaluation Engine.
+"""Dynamic Microservice Policy Admission Engine.
 
-Validates microservice operational metadata against enterprise governance rules.
+Evaluates arbitrary workload specifications against active enterprise admission rules.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict, List
 
 
-class PolicyRuleEngine:
-    """Executes declarative security posture checks."""
+class AdmissionPolicyEngine:
+    """In-memory admission rule evaluation engine."""
 
-    @staticmethod
-    def evaluate_slsa_posture(metadata: Dict[str, Any]) -> Dict[str, Any]:
-        required_keys = ["slsa_level", "signed_by", "rekor_verified"]
-        missing = [k for k in required_keys if k not in metadata]
+    REQUIRED_LABELS = ["app.kubernetes.io/name", "app.kubernetes.io/part-of"]
 
-        is_l3 = metadata.get("slsa_level") == "SLSA_BUILD_LEVEL_3"
-        valid = len(missing) == 0 and is_l3 and metadata.get("rekor_verified") is True
+    @classmethod
+    def evaluate(cls, manifest: Dict[str, Any]) -> Dict[str, Any]:
+        violations: List[str] = []
+        labels = manifest.get("metadata", {}).get("labels", {})
+        for req in cls.REQUIRED_LABELS:
+            if req not in labels:
+                violations.append(f"Missing required label: {req}")
 
+        spec = manifest.get("spec", {})
+        containers = spec.get("containers", [])
+        for c in containers:
+            sec_ctx = c.get("securityContext", {})
+            if sec_ctx.get("privileged", False):
+                violations.append(f"Privileged container not allowed: {c.get('name')}")
+            if not sec_ctx.get("readOnlyRootFilesystem", False):
+                violations.append(
+                    f"Container must set readOnlyRootFilesystem=true: {c.get('name')}"
+                )
+
+        allowed = len(violations) == 0
         return {
-            "compliant": valid,
-            "slsa_level": metadata.get("slsa_level", "NONE"),
-            "status": "COMPLIANT" if valid else "NON_COMPLIANT",
-            "missing_attributes": missing,
+            "allowed": allowed,
+            "violations_count": len(violations),
+            "violations": violations,
         }
 
 
-policy_engine = PolicyRuleEngine()
+policy_engine = AdmissionPolicyEngine()
