@@ -367,3 +367,12 @@ async def post_verify_spiffe(body: Dict[str, Any]) -> Dict[str, Any]:
     spiffe_id = body.get("spiffe_id", "")
     expected = body.get("expected_trust_domain", "enterprise.supplychain.net")
     return spiffe_validator.validate_spiffe_id(spiffe_id, expected_trust_domain=expected)
+
+@app.post("/api/v1/vuln/evaluate", summary="Evaluate Composite EPSS and CVSS Vulnerability Risk")
+async def post_evaluate_vuln(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Computes weighted composite risk score from CVSS base and EPSS exploit probability."""
+    from src.vulnerability_evaluator import vulnerability_evaluator
+    cve = body.get("cve_id", "CVE-UNKNOWN")
+    cvss = float(body.get("cvss", 0.0))
+    epss = float(body.get("epss", 0.0))
+    return vulnerability_evaluator.evaluate_vulnerability(cve, cvss, epss)
