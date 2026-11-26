@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-shareprocessnamespace
+  annotations:
+    policies.kyverno.io/title: Disallow ShareProcessNamespace
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Pods must not share the process namespace across containers to prevent lateral inspection.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-shareprocessnamespace
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "shareProcessNamespace must not be set to true."
+        pattern:
+          spec:
+            X(shareProcessNamespace): true
