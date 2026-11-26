@@ -359,3 +359,11 @@ async def get_crypto_benchmark(iterations: int = 500) -> Dict[str, Any]:
     """Executes on-demand cryptographic hashing performance micro-benchmark."""
     from src.security_benchmarks import benchmark_runner
     return benchmark_runner.run_benchmark(iterations=min(iterations, 2000))
+
+@app.post("/api/v1/identity/spiffe/verify", summary="Verify Workload SPIFFE SVID Identity")
+async def post_verify_spiffe(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Validates workload SPIFFE ID and trust domain conformance."""
+    from src.spiffe_validator import spiffe_validator
+    spiffe_id = body.get("spiffe_id", "")
+    expected = body.get("expected_trust_domain", "enterprise.supplychain.net")
+    return spiffe_validator.validate_spiffe_id(spiffe_id, expected_trust_domain=expected)
