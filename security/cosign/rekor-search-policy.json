@@ -1,0 +1,9 @@
+{
+  "rekorUrl": "https://rekor.sigstore.dev",
+  "requireInclusion": true,
+  "maxAgeSeconds": 2592000,
+  "searchCriteria": {
+    "treeID": "1193639457614072346",
+    "hashType": "sha256"
+  }
+}
