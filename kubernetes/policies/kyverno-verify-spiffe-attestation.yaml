@@ -1,0 +1,32 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-spiffe-attestation
+  annotations:
+    policies.kyverno.io/title: Verify SPIFFE Identity Attestation
+    policies.kyverno.io/category: Identity & Zero Trust
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Verifies that container images possess a valid SPIFFE workload attestation signature.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: verify-spiffe-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - enterprise-sec-pipeline
+      verifyImages:
+        - imageReferences:
+            - "ghcr.io/ravishkarathnayaka/enterprise-secure-app:*"
+          attestations:
+            - predicateType: https://spiffe.io/attestation/workload/v1
+              conditions:
+                - all:
+                    - key: "{{ spiffe.trust_domain }}"
+                      operator: Equals
+                      value: "enterprise.supplychain.net"
