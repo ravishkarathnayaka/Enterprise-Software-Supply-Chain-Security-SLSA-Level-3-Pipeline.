@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-sysctl-hardener
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/component: host-hardening
+spec:
+  selector:
+    matchLabels:
+      app: node-sysctl-hardener
+  template:
+    metadata:
+      labels:
+        app: node-sysctl-hardener
+    spec:
+      hostPID: true
+      containers:
+        - name: sysctl-apply
+          image: busybox:1.36.1@sha256:6e0331034f5909249e083995804ee9352e00888915b4971d603a1d9a26322300
+          command:
+            - /bin/sh
+            - -c
+            - |
+              sysctl -w fs.protected_symlinks=1
+              sysctl -w fs.protected_hardlinks=1
+              sysctl -w kernel.dmesg_restrict=1
+              sleep infinity
