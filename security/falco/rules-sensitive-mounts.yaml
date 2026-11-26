@@ -1,0 +1,9 @@
+# Falco Sensitive Host Mount & Certificate Inspection Detection
+- rule: Sensitive Directory Access in Container
+  desc: Detect access to /etc/shadow or /var/run/secrets/kubernetes.io outside approved processes
+  condition: >
+    open_read and container and (fd.name startswith "/etc/shadow" or fd.name startswith "/root/.ssh")
+  output: >
+    Sensitive host credential directory accessed (user=%user.name command=%proc.cmdline file=%fd.name)
+  priority: CRITICAL
+  tags: [filesystem, credentials, container]
