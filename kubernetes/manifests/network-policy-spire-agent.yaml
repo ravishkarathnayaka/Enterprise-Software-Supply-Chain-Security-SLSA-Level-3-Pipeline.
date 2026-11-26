@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: spire-agent-network-policy
+  namespace: spire
+  labels:
+    app.kubernetes.io/part-of: spiffe-spire
+spec:
+  podSelector:
+    matchLabels:
+      app: spire-agent
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8081
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: spire-server
+      ports:
+        - protocol: TCP
+          port: 8081
