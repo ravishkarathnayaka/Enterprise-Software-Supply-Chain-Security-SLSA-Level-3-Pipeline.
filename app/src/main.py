@@ -384,3 +384,12 @@ async def post_verify_drift(body: Dict[str, Any]) -> Dict[str, Any]:
     base = body.get("baseline_digest", "")
     running = body.get("running_digest", "")
     return drift_detector.detect_drift(base, running)
+
+@app.post("/api/v1/enclave/attest", summary="Validate Hardware Enclave Measurement Quote")
+async def post_attest_enclave(body: Dict[str, Any]) -> Dict[str, Any]:
+    """Validates remote hardware enclave PCR measurements against golden security baseline."""
+    from src.enclave_attestor import enclave_validator
+    eid = body.get("enclave_id", "")
+    pcr0 = body.get("pcr0", "")
+    data = body.get("user_data", "")
+    return enclave_validator.validate_quote(eid, pcr0, data)
