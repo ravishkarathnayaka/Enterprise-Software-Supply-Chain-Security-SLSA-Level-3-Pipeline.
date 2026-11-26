@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: enforce-hpa-bounds
+  annotations:
+    policies.kyverno.io/title: Enforce HorizontalPodAutoscaler Limits
+    policies.kyverno.io/category: Availability & Resource Governance
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      HPAs must define minReplicas >= 2 for HA and maxReplicas <= 20 to prevent runaway resource exhaustion.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-hpa-min-max
+      match:
+        any:
+          - resources:
+              kinds:
+                - HorizontalPodAutoscaler
+      validate:
+        message: "HPA minReplicas must be at least 2 and maxReplicas at most 20."
+        pattern:
+          spec:
+            minReplicas: ">=2"
+            maxReplicas: "<=20"
