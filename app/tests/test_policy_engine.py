@@ -1,21 +1,42 @@
-﻿"""Unit tests for PolicyRuleEngine."""
+"""Unit tests for AdmissionPolicyEngine."""
 
-from src.policy_engine import PolicyRuleEngine
+from src.policy_engine import AdmissionPolicyEngine
 
 
-def test_policy_engine_slsa_compliant():
-    meta = {
-        "slsa_level": "SLSA_BUILD_LEVEL_3",
-        "signed_by": "sigstore-fulcio",
-        "rekor_verified": True,
+def test_policy_engine_valid_manifest():
+    manifest = {
+        "metadata": {
+            "labels": {
+                "app.kubernetes.io/name": "test-app",
+                "app.kubernetes.io/part-of": "enterprise-supply-chain",
+            }
+        },
+        "spec": {
+            "containers": [
+                {
+                    "name": "app",
+                    "securityContext": {
+                        "privileged": False,
+                        "readOnlyRootFilesystem": True,
+                    },
+                }
+            ]
+        },
     }
-    res = PolicyRuleEngine.evaluate_slsa_posture(meta)
-    assert res["compliant"] is True
-    assert res["status"] == "COMPLIANT"
+    res = AdmissionPolicyEngine.evaluate(manifest)
+    assert res["allowed"] is True
+    assert res["violations_count"] == 0
 
 
-def test_policy_engine_slsa_non_compliant():
-    meta = {"slsa_level": "SLSA_BUILD_LEVEL_1", "rekor_verified": False}
-    res = PolicyRuleEngine.evaluate_slsa_posture(meta)
-    assert res["compliant"] is False
-    assert len(res["missing_attributes"]) > 0
+def test_policy_engine_privileged_blocked():
+    manifest = {
+        "metadata": {"labels": {}},
+        "spec": {
+            "containers": [
+                {"name": "bad", "securityContext": {"privileged": True}}
+            ]
+        },
+    }
+    res = AdmissionPolicyEngine.evaluate(manifest)
+    assert res["allowed"] is False
+    assert res["violations_count"] >= 2
