@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-runasgroup
+  annotations:
+    policies.kyverno.io/title: Require Run As Group
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Containers must define an explicit non-zero runAsGroup in their security context.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-runasgroup-nonzero
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "runAsGroup must be explicitly specified and greater than 0."
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  runAsGroup: ">0"
