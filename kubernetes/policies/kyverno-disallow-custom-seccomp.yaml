@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-custom-seccomp
+  annotations:
+    policies.kyverno.io/title: Enforce Default Seccomp Profile
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Containers must use RuntimeDefault or Localhost seccomp profile. Unconfined is strictly prohibited.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-seccomp-profile
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Seccomp profile must be set to RuntimeDefault or Localhost."
+        pattern:
+          spec:
+            =(securityContext):
+              seccompProfile:
+                type: "RuntimeDefault | Localhost"
