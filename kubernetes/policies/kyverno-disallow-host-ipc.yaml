@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-host-ipc
+  annotations:
+    policies.kyverno.io/title: Disallow Host IPC
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Containers must not share host IPC namespaces to prevent memory inspection attacks.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-no-host-ipc
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "hostIPC must not be set to true."
+        pattern:
+          spec:
+            X(hostIPC): true
