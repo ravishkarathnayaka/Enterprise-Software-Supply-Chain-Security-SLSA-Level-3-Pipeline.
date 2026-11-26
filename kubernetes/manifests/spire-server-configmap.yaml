@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spire-server-config
+  namespace: spire
+data:
+  server.conf: |
+    server {
+      bind_address = "0.0.0.0"
+      bind_port = "8081"
+      trust_domain = "enterprise.supplychain.net"
+      data_dir = "/run/spire/data"
+      log_level = "INFO"
+      ca_ttl = "72h"
+      default_svid_ttl = "1h"
+    }
