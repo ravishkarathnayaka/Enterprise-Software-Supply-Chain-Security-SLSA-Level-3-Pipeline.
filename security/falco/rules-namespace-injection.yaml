@@ -1,0 +1,9 @@
+# Falco Linux Namespace Boundary Violation Detection
+- rule: Execution of Namespace Escape Utilities
+  desc: Detect invocation of nsenter, unshare, or setns within container context
+  condition: >
+    spawned_process and container and proc.name in (nsenter, unshare, setns)
+  output: >
+    Privilege boundary breakout attempt detected (user=%user.name command=%proc.cmdline container=%container.name)
+  priority: CRITICAL
+  tags: [privilege_escalation, container, escape]
