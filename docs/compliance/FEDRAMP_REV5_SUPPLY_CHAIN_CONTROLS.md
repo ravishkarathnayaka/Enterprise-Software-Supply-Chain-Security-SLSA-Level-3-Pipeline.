@@ -1,12 +1,7 @@
-﻿# FedRAMP Rev 5: Software Supply Chain Control Baseline
+# FedRAMP High Revision 5 Baseline: Supply Chain Risk Management (SR)
 
-## 1. Overview
-Federal Risk and Authorization Management Program (**FedRAMP**) Rev 5 incorporates NIST SP 800-53 Rev 5 supply chain security families.
-
----
-
-## 2. Control Cross-Reference
-- **SR-3 (Supply Chain Controls & Processes)**: Automated SBOM generation in CycloneDX/SPDX formats.
-- **SA-4 (Acquisition Process)**: Third-party component vulnerability tracking via Trivy.
-- **SA-11 (Developer Testing & Evaluation)**: Automated SAST and unit test suites running in isolated CI runners.
-- **SI-7 (Software & Firmware Integrity)**: Cosign cryptographic attestation validation at the admission webhook.
+## Mapped Security Controls
+- **SR-3: Supply Chain Controls and Processes**: Strict vendor verification, open-source dependency auditing with OSV-Scanner and Trivy.
+- **SR-4: Provenance**: SLSA Build Level 3 non-forgeable provenance generated on isolated GitHub Actions builders.
+- **SR-5: Acquisition Strategy, Tools, and Funding**: Automated license compliance audit eliminating non-approved OSS licenses.
+- **SI-7: Software, Firmware, and Information Integrity**: Cryptographic signing of build artifacts with Cosign and Sigstore transparency logging.
