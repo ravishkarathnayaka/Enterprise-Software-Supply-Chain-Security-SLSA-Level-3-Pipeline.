@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-wildcard-ingress
+  annotations:
+    policies.kyverno.io/title: Disallow Wildcard Ingress Hosts
+    policies.kyverno.io/category: Network Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Ingress resources must define fully qualified domain names and forbid wildcard hosts.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-no-wildcards
+      match:
+        any:
+          - resources:
+              kinds:
+                - Ingress
+      validate:
+        message: "Wildcard hostnames (*.example.com) are disallowed in production Ingresses."
+        pattern:
+          spec:
+            rules:
+              - host: "!*\\**"
